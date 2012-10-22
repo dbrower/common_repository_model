@@ -25,6 +25,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency "activemodel", "~>3.2"
   gem.add_dependency "builder", "~>3.0"
   gem.add_runtime_dependency "minitest"
-  gem.add_runtime_dependency "minitest-matcher"
-  gem.add_runtime_dependency "active-fedora", "4.5.2"
+  gem.add_runtime_dependency "minitest-matchers"
+  gem.add_runtime_dependency "active-fedora", "4.6.0.rc3"
 end
