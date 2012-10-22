@@ -1,6 +1,6 @@
 # CommonRepositoryModel
 
-TODO: Write a gem description
+Notre Dame's Common Fedora Repository Model
 
 ## Installation
 
