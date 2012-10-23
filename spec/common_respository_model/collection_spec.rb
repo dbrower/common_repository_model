@@ -27,4 +27,11 @@ describe CommonRepositoryModel::Collection do
     assert_equal archive_identifier, subject.archive_identifier
   end
 
+  it 'should belong_to #area' do
+    assert_respond_to subject, :area
+    assert_respond_to subject, :area=
+    assert_respond_to subject, :area_id
+    assert_respond_to subject, :area_id=
+  end
+
 end
