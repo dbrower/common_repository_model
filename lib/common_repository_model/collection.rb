@@ -10,12 +10,10 @@ module CommonRepositoryModel
     )
 
     has_many(
-      :members,
+      :child_collections,
       class_name: 'CommonRepositoryModel::Collection',
       property: :is_member_of
     )
-
-    # has_many :parts, :class_name=>'GenericData', :property=>:is_part_of
 
     has_metadata name: "properties", type: ActiveFedora::SimpleDatastream do |m|
       m.field :archive_identifier, :string

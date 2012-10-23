@@ -11,8 +11,8 @@ describe CommonRepositoryModel::Area do
     assert_equal area_name, subject.area_name
   end
 
-  it 'should have_many #members' do
-    subject.members.must_be_kind_of(Array)
+  it 'should have_many #collections' do
+    subject.collections.must_be_kind_of(Array)
   end
 
 end
