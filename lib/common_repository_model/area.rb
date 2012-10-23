@@ -3,7 +3,7 @@ module CommonRepositoryModel
   class Area < PersistenceBase
 
     has_many(
-      :collections,
+      :members,
       class_name: 'CommonRepositoryModel::Collection',
       property: :is_member_of_area
     )
