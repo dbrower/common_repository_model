@@ -1,6 +1,5 @@
-lib = File.expand_path('../../../lib', __FILE__)
-require 'minitest/autorun'
-require File.join(lib,'common_repository_model/area')
+require_relative '../spec_helper'
+require 'common_repository_model/area'
 
 describe CommonRepositoryModel::Area do
 
