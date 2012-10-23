@@ -34,4 +34,8 @@ describe CommonRepositoryModel::Collection do
     assert_respond_to subject, :area_id=
   end
 
+  it 'should have_many #members' do
+    subject.members.must_be_kind_of(Array)
+  end
+
 end
