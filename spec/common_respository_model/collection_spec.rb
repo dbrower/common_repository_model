@@ -7,15 +7,15 @@ describe CommonRepositoryModel::Collection do
     CommonRepositoryModel::Collection.new(
       archive_identifier: archive_identifier,
       archive_link: archive_link,
-      collection: collection
+      name: name
     )
   }
   let(:archive_identifier) { 'my archive identifier'}
   let(:archive_link) { 'my archive link' }
-  let(:collection) { 'my collection' }
+  let(:name) { 'my name' }
 
-  it 'should have #collection' do
-    assert_equal collection, subject.collection
+  it 'should have #name' do
+    assert_equal name, subject.name
   end
 
   it 'should have #archive_link' do
@@ -29,9 +29,9 @@ describe CommonRepositoryModel::Collection do
   it 'should belong_to #area' do
     assert_respond_to subject, :area
     assert_respond_to subject, :area=
-    assert_respond_to subject, :area_id
+      assert_respond_to subject, :area_id
     assert_respond_to subject, :area_id=
-  end
+      end
 
   describe 'has_many #child_collections' do
     it 'should build #child_collections' do
@@ -40,10 +40,16 @@ describe CommonRepositoryModel::Collection do
     end
   end
 
+  describe 'has_and_belongs_to_many #parent_collections' do
+    it 'should be an Array' do
+      subject.parent_collections.must_be_kind_of Array
+    end
+  end
+
 
   describe 'integration' do
     let(:child_collection) { CommonRepositoryModel::Collection.new }
-    it 'should save' do
+    it 'should handle parent/child collection' do
       # Before we can add a collection, the containing object
       # must be saved
       subject.save.must_equal true
@@ -52,6 +58,9 @@ describe CommonRepositoryModel::Collection do
       new_subject = subject.class.find(subject.pid)
 
       new_subject.child_collections.size.must_equal 1
+
+      new_subject.child_collections.first.
+        parent_collections.first.must_equal new_subject
     end
   end
 
