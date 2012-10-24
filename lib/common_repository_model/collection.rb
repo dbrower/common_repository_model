@@ -13,15 +13,15 @@ module CommonRepositoryModel
     has_and_belongs_to_many(
       :child_collections,
       class_name: 'CommonRepositoryModel::Collection',
-      property: :is_parent_of,
-      inverse_of: :is_child_of
+      property: :is_member_of,
+      inverse_of: :has_membership_in
     )
 
     has_and_belongs_to_many(
       :parent_collections,
       class_name: 'CommonRepositoryModel::Collection',
-      property: :is_child_of,
-      inverse_of: :is_parent_of
+      property: :has_membership_in,
+      inverse_of: :is_member_of
     )
 
     has_metadata name: "properties", type: ActiveFedora::SimpleDatastream do |m|

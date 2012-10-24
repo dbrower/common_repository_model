@@ -16,6 +16,8 @@
 :predicate_mapping:
   info:common_repository_model#:
     :is_member_of_area: isMemberOfArea
+    :is_member_of: isMemberOf
+    :has_membership_in: hasMembershipIn
     :is_parent_of: isParentOf
     :is_child_of: isChildOf
   info:fedora/fedora-system:def/relations-external#:
