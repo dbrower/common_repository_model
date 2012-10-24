@@ -1,4 +1,5 @@
 require_relative './persistence_base'
+require_relative './collection'
 module CommonRepositoryModel
   class Area < PersistenceBase
 
