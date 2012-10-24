@@ -17,9 +17,13 @@
   info:common_repository_model#:
     :is_member_of_area: isMemberOfArea
     :is_member_of: isMemberOf
-    :has_membership_in: hasMembershipIn
+    :has_members: hasMembers
     :is_parent_of: isParentOf
     :is_child_of: isChildOf
+    :is_family_member_of: isFamilyMemberOf
+    :has_family_members: hasFamilyMembers
+    :is_working_as: isWorkingAs
+    :has_workers: hasWorkers
   info:fedora/fedora-system:def/relations-external#:
     :conforms_to: conformsTo
     :has_annotation: hasAnnotation
