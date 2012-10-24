@@ -1,4 +1,5 @@
 require_relative './persistence_base'
+require_relative './area'
 
 module CommonRepositoryModel
   class Collection < PersistenceBase
@@ -12,7 +13,7 @@ module CommonRepositoryModel
     has_many(
       :child_collections,
       class_name: 'CommonRepositoryModel::Collection',
-      property: :is_member_of
+      property: :is_parent_of
     )
 
     has_metadata name: "properties", type: ActiveFedora::SimpleDatastream do |m|
