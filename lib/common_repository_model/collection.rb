@@ -56,15 +56,15 @@ module CommonRepositoryModel
     has_and_belongs_to_many(
       :child_collections,
       class_name: 'CommonRepositoryModel::Collection',
-      property: :is_member_of,
-      inverse_of: :has_members
+      property: :has_members,
+      inverse_of: :is_member_of
     )
 
     has_and_belongs_to_many(
       :parent_collections,
       class_name: 'CommonRepositoryModel::Collection',
-      property: :has_members,
-      inverse_of: :is_member_of
+      property: :is_member_of,
+      inverse_of: :has_members
     )
 
     has_metadata name: "properties", type: ActiveFedora::SimpleDatastream do |m|
