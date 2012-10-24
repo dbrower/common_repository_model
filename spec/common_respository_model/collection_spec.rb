@@ -1,5 +1,5 @@
 require_relative '../spec_helper'
-require File.join(lib,'common_repository_model/collection')
+require 'common_repository_model/collection'
 
 describe CommonRepositoryModel::Collection do
 
@@ -33,8 +33,26 @@ describe CommonRepositoryModel::Collection do
     assert_respond_to subject, :area_id=
   end
 
-  it 'should have_many #child_collections' do
-    subject.child_collections.must_be_kind_of(Array)
+  describe 'has_many #child_collections' do
+    it 'should build #child_collections' do
+      subject.child_collections.build.
+        must_be_kind_of(CommonRepositoryModel::Collection)
+    end
+  end
+
+
+  describe 'integration' do
+    let(:child_collection) { CommonRepositoryModel::Collection.new }
+    it 'should save' do
+      # Before we can add a collection, the containing object
+      # must be saved
+      subject.save.must_equal true
+      subject.child_collections << child_collection
+      subject.save.must_equal true
+      new_subject = subject.class.find(subject.pid)
+
+      new_subject.child_collections.size.must_equal 1
+    end
   end
 
 end
