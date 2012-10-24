@@ -99,9 +99,9 @@ describe CommonRepositoryModel::Collection do
 
     reloaded_theo.child_collections.count.must_equal 0
 
-    reloaded_theo.contained_in_collections.must_include(heathcliff)
-    reloaded_theo.contained_in_collections.must_include(claire)
-    reloaded_theo.contained_in_collections.must_include(family)
+    reloaded_theo.parent_collections.must_include(heathcliff)
+    reloaded_theo.parent_collections.must_include(claire)
+    reloaded_theo.parent_collections.must_include(family)
 
     reloaded_claire = claire.class.find(claire.pid)
     reloaded_claire.jobs.size.must_equal 1
@@ -112,6 +112,6 @@ describe CommonRepositoryModel::Collection do
     reloaded_claire.child_collections.must_include(vanessa)
     reloaded_claire.child_collections.must_include(rudy)
 
-    reloaded_claire.contained_in_collections.must_include(family)
+    reloaded_claire.parent_collections.must_include(family)
   end
 end

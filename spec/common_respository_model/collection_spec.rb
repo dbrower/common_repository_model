@@ -40,9 +40,9 @@ describe CommonRepositoryModel::Collection do
     end
   end
 
-  describe 'has_and_belongs_to_many #contained_in_collections' do
+  describe 'has_and_belongs_to_many #parent_collections' do
     it 'should be an Array' do
-      subject.contained_in_collections.must_be_kind_of Array
+      subject.parent_collections.must_be_kind_of Array
     end
   end
 
@@ -60,7 +60,7 @@ describe CommonRepositoryModel::Collection do
       new_subject.child_collections.size.must_equal 1
 
       new_subject.child_collections.first.
-        contained_in_collections.first.must_equal new_subject
+        parent_collections.first.must_equal new_subject
     end
   end
 

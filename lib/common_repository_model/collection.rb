@@ -42,7 +42,7 @@ module CommonRepositoryModel
         public_send(association_name)
       end.flatten
 
-      self.contained_in_collections = collected_is_member_of
+      self.parent_collections = collected_is_member_of
 
       super
     end
@@ -61,7 +61,7 @@ module CommonRepositoryModel
     )
 
     has_and_belongs_to_many(
-      :contained_in_collections,
+      :parent_collections,
       class_name: 'CommonRepositoryModel::Collection',
       property: :has_members,
       inverse_of: :is_member_of
