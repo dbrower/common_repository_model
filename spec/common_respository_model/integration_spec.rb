@@ -105,11 +105,11 @@ describe CommonRepositoryModel::Collection do
     assert_rels_ext @theo, :is_child_of, [@claire, heathcliff]
     assert_rels_ext @theo, :is_member_of, [@claire, family, heathcliff]
 
-    assert_af_association(@theo, :jobs, [])
-    assert_af_association(@theo, :families, [family])
-    assert_af_association(@theo, :parents, [heathcliff,claire])
-    assert_af_association(@theo, :child_collections, [])
-    assert_af_association(
+    assert_active_fedora_has_many(@theo, :jobs, [])
+    assert_active_fedora_has_many(@theo, :families, [family])
+    assert_active_fedora_has_many(@theo, :parents, [heathcliff,claire])
+    assert_active_fedora_has_many(@theo, :child_collections, [])
+    assert_active_fedora_has_many(
       @theo, :parent_collections, [heathcliff,claire,family]
     )
 
@@ -117,27 +117,12 @@ describe CommonRepositoryModel::Collection do
     assert_rels_ext @claire, :is_family_member_of, [family]
     assert_rels_ext @claire, :is_member_of, [family]
 
-    assert_af_association(@claire,:jobs,[lawyer])
-    assert_af_association(@claire,:families,[family])
-    assert_af_association(@claire,:children,[theo, rudy, vanessa])
-    assert_af_association(@claire,:child_collections,[theo, rudy, vanessa])
-    assert_af_association(@claire,:parent_collections,[family])
-  end
-
-  def assert_rels_ext(subject, predicate, objects = [])
-    subject.relationships(predicate).count.must_equal(objects.count)
-    objects.each do |object|
-      internal_uri = object.respond_to?(:internal_uri) ?
-        object.internal_uri : object
-      subject.relationships(predicate).must_include(internal_uri)
-    end
-  end
-
-  def assert_af_association(subject, method_name, objects)
-    association = subject.send(method_name)
-    association.count.must_equal(objects.count)
-    objects.each do |object|
-      association.must_include(object)
-    end
+    assert_active_fedora_has_many(@claire,:jobs,[lawyer])
+    assert_active_fedora_has_many(@claire,:families,[family])
+    assert_active_fedora_has_many(@claire,:children,[theo, rudy, vanessa])
+    assert_active_fedora_has_many(
+      @claire,:child_collections,[theo, rudy, vanessa]
+    )
+    assert_active_fedora_has_many(@claire,:parent_collections,[family])
   end
 end
