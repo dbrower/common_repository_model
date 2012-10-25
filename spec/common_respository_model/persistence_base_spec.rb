@@ -1,5 +1,5 @@
 require_relative '../spec_helper'
-require File.join(lib,'common_repository_model/persistence_base')
+require 'common_repository_model/persistence_base'
 
 describe CommonRepositoryModel::PersistenceBase do
 
