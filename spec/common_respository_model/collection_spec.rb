@@ -34,12 +34,18 @@ describe CommonRepositoryModel::Collection do
       subject.save.must_equal true
       subject.child_collections << child_collection
       subject.save.must_equal true
-      new_subject = subject.class.find(subject.pid)
+      @collection = subject.class.find(subject.pid)
+      @child_collection = child_collection.class.find(child_collection.pid)
 
-      new_subject.child_collections.size.must_equal 1
+      assert_rels_ext(@collection, :has_members, [@child_collection])
+      assert_active_fedora_has_many(
+        @collection, :child_collections, [@child_collection]
+      )
 
-      new_subject.child_collections.first.
-        parent_collections.first.must_equal new_subject
+      assert_rels_ext(@child_collection, :is_member_of, [@collection])
+      assert_active_fedora_has_many(
+        @child_collection, :parent_collections, [@collection]
+      )
     end
   end
 
