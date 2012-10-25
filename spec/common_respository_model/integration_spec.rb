@@ -53,16 +53,7 @@ class Person < CommonRepositoryModel::Collection
 end
 
 describe CommonRepositoryModel::Collection do
-  let(:family) { Family.new }
-  let(:lawyer) { Job.new }
-  let(:doctor) { Job.new }
-  let(:heathcliff) { Person.new }
-  let(:claire) { Person.new }
-  let(:theo) { Person.new }
-  let(:vanessa) { Person.new }
-  let(:rudy) { Person.new }
-
-  it 'verifies complicated relationships' do
+  before(:all) do
     family.save
 
     lawyer.save
@@ -90,28 +81,63 @@ describe CommonRepositoryModel::Collection do
     vanessa.save
     rudy.families << family
     rudy.save
+  end
+  let(:family) { Family.new }
+  let(:lawyer) { Job.new }
+  let(:doctor) { Job.new }
+  let(:heathcliff) { Person.new }
+  let(:claire) { Person.new }
+  let(:theo) { Person.new }
+  let(:vanessa) { Person.new }
+  let(:rudy) { Person.new }
 
-    reloaded_theo = theo.class.find(theo.pid)
+  it 'verifies complicated relationships' do
+    @theo = theo.class.find(theo.pid)
+    @family = family.class.find(family.pid)
+    @claire = claire.class.find(claire.pid)
 
-    reloaded_theo.jobs.size.must_equal 0
-    reloaded_theo.families.size.must_equal 1
-    reloaded_theo.parents.size.must_equal 2
+    assert_rels_ext(
+      @family,
+      :has_family_members,
+      [@theo,@claire, heathcliff,rudy, vanessa]
+    )
 
-    reloaded_theo.child_collections.count.must_equal 0
+    assert_rels_ext @theo, :is_child_of, [@claire, heathcliff]
+    assert_rels_ext @theo, :is_member_of, [@claire, family, heathcliff]
 
-    reloaded_theo.parent_collections.must_include(heathcliff)
-    reloaded_theo.parent_collections.must_include(claire)
-    reloaded_theo.parent_collections.must_include(family)
+    assert_af_association(@theo, :jobs, [])
+    assert_af_association(@theo, :families, [family])
+    assert_af_association(@theo, :parents, [heathcliff,claire])
+    assert_af_association(@theo, :child_collections, [])
+    assert_af_association(
+      @theo, :parent_collections, [heathcliff,claire,family]
+    )
 
-    reloaded_claire = claire.class.find(claire.pid)
-    reloaded_claire.jobs.size.must_equal 1
-    reloaded_claire.families.size.must_equal 1
-    reloaded_claire.children.size.must_equal 3
+    assert_rels_ext @claire, :is_parent_of, [@theo,vanessa,rudy]
+    assert_rels_ext @claire, :is_family_member_of, [family]
+    assert_rels_ext @claire, :is_member_of, [family]
 
-    reloaded_claire.child_collections.must_include(theo)
-    reloaded_claire.child_collections.must_include(vanessa)
-    reloaded_claire.child_collections.must_include(rudy)
+    assert_af_association(@claire,:jobs,[lawyer])
+    assert_af_association(@claire,:families,[family])
+    assert_af_association(@claire,:children,[theo, rudy, vanessa])
+    assert_af_association(@claire,:child_collections,[theo, rudy, vanessa])
+    assert_af_association(@claire,:parent_collections,[family])
+  end
 
-    reloaded_claire.parent_collections.must_include(family)
+  def assert_rels_ext(subject, predicate, objects = [])
+    subject.relationships(predicate).count.must_equal(objects.count)
+    objects.each do |object|
+      internal_uri = object.respond_to?(:internal_uri) ?
+        object.internal_uri : object
+      subject.relationships(predicate).must_include(internal_uri)
+    end
+  end
+
+  def assert_af_association(subject, method_name, objects)
+    association = subject.send(method_name)
+    association.count.must_equal(objects.count)
+    objects.each do |object|
+      association.must_include(object)
+    end
   end
 end
