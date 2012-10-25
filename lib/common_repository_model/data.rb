@@ -9,11 +9,4 @@ class CommonRepositoryModel::Data < CommonRepositoryModel::PersistenceBase
     property: :is_part_of
   )
 
-  has_file_datastream(
-    name: "content",
-    prefix: "CONTENT",
-    type: ActiveFedora::Datastream,
-    controlGroup: 'M'
-  )
-
 end
