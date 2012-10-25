@@ -67,20 +67,5 @@ module CommonRepositoryModel
       inverse_of: :has_members
     )
 
-    has_metadata name: "properties", type: ActiveFedora::SimpleDatastream do |m|
-      m.field :archive_identifier, :string
-      m.field :archive_link, :string
-      m.field :name, :string
-    end
-
-    delegate_to(
-      :properties,
-      [
-        :archive_identifier,
-        :archive_link,
-        :name
-      ],
-      unique: true
-    )
   end
 end

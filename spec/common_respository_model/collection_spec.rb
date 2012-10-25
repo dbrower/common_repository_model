@@ -3,35 +3,14 @@ require 'common_repository_model/collection'
 
 describe CommonRepositoryModel::Collection do
 
-  subject {
-    CommonRepositoryModel::Collection.new(
-      archive_identifier: archive_identifier,
-      archive_link: archive_link,
-      name: name
-    )
-  }
-  let(:archive_identifier) { 'my archive identifier'}
-  let(:archive_link) { 'my archive link' }
-  let(:name) { 'my name' }
-
-  it 'should have #name' do
-    assert_equal name, subject.name
-  end
-
-  it 'should have #archive_link' do
-    assert_equal archive_link, subject.archive_link
-  end
-
-  it 'should have #archive_identifier' do
-    assert_equal archive_identifier, subject.archive_identifier
-  end
+  subject { CommonRepositoryModel::Collection.new }
 
   it 'should belong_to #area' do
-    assert_respond_to subject, :area
-    assert_respond_to subject, :area=
-      assert_respond_to subject, :area_id
-    assert_respond_to subject, :area_id=
-      end
+    subject.must_respond_to(:area)
+    subject.must_respond_to(:area=)
+    subject.must_respond_to(:area_id)
+    subject.must_respond_to(:area_id=)
+  end
 
   describe 'has_many #child_collections' do
     it 'should build #child_collections' do
