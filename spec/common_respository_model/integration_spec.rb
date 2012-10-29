@@ -107,12 +107,22 @@ describe CommonRepositoryModel::Collection do
   end
 
   it 'verifies complicated relationships' do
+    verify_initial_relations_for_family
+    verify_initial_relations_for_theo
+    verify_initial_relations_for_claire
+    verify_initial_relations_for_dress
+  end
+
+  protected
+  def verify_initial_relations_for_family
     assert_rels_ext(
       @family,
       :has_family_members,
       [@theo,@claire, heathcliff,rudy, vanessa]
     )
+  end
 
+  def verify_initial_relations_for_theo
     assert_rels_ext @theo, :is_child_of, [@claire, heathcliff]
     assert_rels_ext @theo, :is_member_of, [@claire, family, heathcliff]
 
@@ -123,10 +133,14 @@ describe CommonRepositoryModel::Collection do
     assert_active_fedora_has_many(
       @theo, :parent_collections, [heathcliff,claire,family]
     )
+  end
 
+  def verify_initial_relations_for_dress
     assert_rels_ext(@dress, :is_part_of, [@claire])
     assert_active_fedora_belongs_to(@dress, :collection, @claire)
+  end
 
+  def verify_initial_relations_for_clair
     assert_rels_ext @claire, :is_parent_of, [@theo,vanessa,rudy]
     assert_rels_ext @claire, :is_family_member_of, [family]
     assert_rels_ext @claire, :is_member_of, [family]
