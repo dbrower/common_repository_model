@@ -57,6 +57,17 @@ class Person < CommonRepositoryModel::Collection
 end
 
 describe CommonRepositoryModel::Collection do
+
+  let(:family) { Family.new }
+  let(:lawyer) { Job.new }
+  let(:doctor) { Job.new }
+  let(:heathcliff) { Person.new }
+  let(:claire) { Person.new }
+  let(:theo) { Person.new }
+  let(:vanessa) { Person.new }
+  let(:rudy) { Person.new }
+  let(:dress) { Clothing.new }
+
   before(:all) do
     family.save
 
@@ -88,24 +99,14 @@ describe CommonRepositoryModel::Collection do
     vanessa.save
     rudy.families << family
     rudy.save
-  end
 
-  let(:family) { Family.new }
-  let(:lawyer) { Job.new }
-  let(:doctor) { Job.new }
-  let(:heathcliff) { Person.new }
-  let(:claire) { Person.new }
-  let(:theo) { Person.new }
-  let(:vanessa) { Person.new }
-  let(:rudy) { Person.new }
-  let(:dress) { Clothing.new }
-
-  it 'verifies complicated relationships' do
     @dress = dress.class.find(dress.pid)
     @theo = theo.class.find(theo.pid)
     @family = family.class.find(family.pid)
     @claire = claire.class.find(claire.pid)
+  end
 
+  it 'verifies complicated relationships' do
     assert_rels_ext(
       @family,
       :has_family_members,
