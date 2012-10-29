@@ -12,6 +12,10 @@ describe CommonRepositoryModel::Collection do
     subject.must_respond_to(:area_id=)
   end
 
+  it 'has many data' do
+    subject.data.build.must_be_kind_of(CommonRepositoryModel::Data)
+  end
+
   describe 'has_many #child_collections' do
     it 'should build #child_collections' do
       subject.child_collections.build.

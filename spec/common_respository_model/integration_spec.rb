@@ -1,6 +1,10 @@
 require_relative '../spec_helper'
 require 'common_repository_model/collection'
 
+
+class Clothing < CommonRepositoryModel::Data
+end
+
 class Job < CommonRepositoryModel::Collection
   has_and_belongs_to_many(
     :people,
@@ -65,9 +69,12 @@ describe CommonRepositoryModel::Collection do
     vanessa.save
     rudy.save
 
+    dress.save
+
     claire.children = [theo,vanessa,rudy]
     claire.jobs << lawyer
     claire.families << family
+    claire.data << dress
     claire.save
 
     heathcliff.children = [theo,vanessa,rudy]
@@ -82,6 +89,7 @@ describe CommonRepositoryModel::Collection do
     rudy.families << family
     rudy.save
   end
+
   let(:family) { Family.new }
   let(:lawyer) { Job.new }
   let(:doctor) { Job.new }
@@ -90,8 +98,10 @@ describe CommonRepositoryModel::Collection do
   let(:theo) { Person.new }
   let(:vanessa) { Person.new }
   let(:rudy) { Person.new }
+  let(:dress) { Clothing.new }
 
   it 'verifies complicated relationships' do
+    @dress = dress.class.find(dress.pid)
     @theo = theo.class.find(theo.pid)
     @family = family.class.find(family.pid)
     @claire = claire.class.find(claire.pid)
@@ -113,10 +123,14 @@ describe CommonRepositoryModel::Collection do
       @theo, :parent_collections, [heathcliff,claire,family]
     )
 
+    assert_rels_ext(@dress, :is_part_of, [@claire])
+    assert_active_fedora_belongs_to(@dress, :collection, @claire)
+
     assert_rels_ext @claire, :is_parent_of, [@theo,vanessa,rudy]
     assert_rels_ext @claire, :is_family_member_of, [family]
     assert_rels_ext @claire, :is_member_of, [family]
 
+    assert_active_fedora_has_many(@claire,:data,[@dress])
     assert_active_fedora_has_many(@claire,:jobs,[lawyer])
     assert_active_fedora_has_many(@claire,:families,[family])
     assert_active_fedora_has_many(@claire,:children,[theo, rudy, vanessa])

@@ -1,5 +1,6 @@
 require_relative './persistence_base'
 require_relative './area'
+require_relative './data'
 require 'set'
 
 module CommonRepositoryModel
@@ -67,5 +68,10 @@ module CommonRepositoryModel
       inverse_of: :has_members
     )
 
+    has_many(
+      :data,
+      class_name: 'CommonRepositoryModel::Data',
+      property: :is_part_of
+    )
   end
 end
