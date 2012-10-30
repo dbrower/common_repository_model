@@ -21,14 +21,28 @@ module CommonRepositoryModel
       self.class.membership_registry
     end
 
-    def self.has_members(method_name, *args)
+    def self.has_members(method_name, options = {})
       membership_registry.has_members << method_name
-      has_many(method_name, *args)
+      has_many(method_name, options)
     end
 
-    def self.is_member_of(method_name, *args)
+    # Creates the :break_relation_with_<macro_name> method which is useful for
+    # managing both the ActiveFedora association and relationship.
+    #
+    # NOTE: I believe this is actually masking an ActiveFedora bug, at some
+    # point, I would imagine that the :break_relation_with method would be
+    # deprecated and ultimately be an alias for
+    # object.<association_name>.delete(obj1,obj2)
+    def self.is_member_of(method_name, options = {})
       membership_registry.is_member_of << method_name
-      has_and_belongs_to_many(method_name, *args)
+      define_method "break_relation_with_#{method_name}" do |*args|
+        send(method_name).delete(*args)
+        args.each do |obj|
+          remove_relationship(options[:property], obj)
+          remove_relationship(:is_member_of, obj)
+        end
+      end
+      has_and_belongs_to_many(method_name, options)
     end
 
     def save

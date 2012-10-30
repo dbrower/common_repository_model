@@ -236,26 +236,20 @@ describe CommonRepositoryModel::Collection do
       @rudy, :parent_collections, [heathcliff,claire,family]
     )
 
-    @rudy.parents = [claire]
+    @rudy.break_relation_with_parents(heathcliff)
     @rudy.save.must_equal true
 
     assert_active_fedora_has_many(@rudy, :parents, [claire])
-    assert_active_fedora_has_many(
-      @rudy, :parent_collections, [claire, family]
-    )
+    assert_active_fedora_has_many(@rudy, :parent_collections, [claire, family])
     assert_rels_ext @rudy, :is_child_of, [claire]
     assert_rels_ext @rudy, :is_member_of, [claire, family]
 
-    reloaded_rudy = @rudy.class.find(@rudy.pid)
+    @rudy = @rudy.class.find(@rudy.pid)
 
-    assert_rels_ext reloaded_rudy, :is_child_of, [claire]
-    assert_rels_ext reloaded_rudy, :is_member_of, [claire, family]
+    assert_rels_ext @rudy, :is_child_of, [claire]
+    assert_rels_ext @rudy, :is_member_of, [claire, family]
 
-    assert_active_fedora_has_many(reloaded_rudy, :parents, [claire])
-
-    assert_active_fedora_has_many(
-      reloaded_rudy, :parent_collections, [claire, family]
-    )
-
+    assert_active_fedora_has_many(@rudy, :parents, [claire])
+    assert_active_fedora_has_many(@rudy, :parent_collections, [claire, family])
   end
 end
