@@ -23,7 +23,7 @@ module CommonRepositoryModel
 
     def self.has_members(method_name, *args)
       membership_registry.has_members << method_name
-      has_and_belongs_to_many(method_name, *args)
+      has_many(method_name, *args)
     end
 
     def self.is_member_of(method_name, *args)
@@ -54,18 +54,16 @@ module CommonRepositoryModel
       property: :is_member_of_area
     )
 
-    has_and_belongs_to_many(
+    has_many(
       :child_collections,
       class_name: 'CommonRepositoryModel::Collection',
-      property: :has_members,
-      inverse_of: :is_member_of
+      property: :is_member_of
     )
 
     has_and_belongs_to_many(
       :parent_collections,
       class_name: 'CommonRepositoryModel::Collection',
-      property: :is_member_of,
-      inverse_of: :has_members
+      property: :is_member_of
     )
 
     has_many(

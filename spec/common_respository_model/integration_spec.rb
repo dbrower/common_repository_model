@@ -18,8 +18,7 @@ class Family < CommonRepositoryModel::Collection
   has_members(
     :family_members,
     class_name: 'Person',
-    property: :has_family_members,
-    inverse_of: :is_family_member_of
+    property: :is_family_member_of
   )
 end
 
@@ -28,23 +27,20 @@ class Person < CommonRepositoryModel::Collection
   is_member_of(
     :parents,
     class_name: 'Person',
-    property: :is_child_of,
-    inverse_of: :is_parent_of
+    property: :is_child_of
   )
 
   has_members(
     :children,
     class_name: 'Person',
-    property: :is_parent_of,
-    inverse_of: :is_child_of
+    property: :is_child_of
   )
 
   # People can be part of multiple families
   is_member_of(
     :families,
     class_name: 'Family',
-    property: :is_family_member_of,
-    inverse_of: :has_family_members,
+    property: :is_family_member_of
   )
 
   has_and_belongs_to_many(
@@ -100,30 +96,53 @@ describe CommonRepositoryModel::Collection do
     rudy.families << family
     rudy.save
 
+    family.family_members = [claire,heathcliff,theo,vanessa,rudy]
+    family.save.must_equal true
+
     @dress = dress.class.find(dress.pid)
     @theo = theo.class.find(theo.pid)
     @family = family.class.find(family.pid)
     @claire = claire.class.find(claire.pid)
+    @rudy = rudy.class.find(rudy.pid)
   end
 
   it 'verifies complicated relationships' do
-    verify_initial_relations_for_family
-    verify_initial_relations_for_theo
-    verify_initial_relations_for_claire
-    verify_initial_relations_for_dress
+    # verify_initial_relations_for_family
+    # verify_initial_relations_for_theo
+    # verify_initial_relations_for_claire
+    # verify_initial_relations_for_dress
 
-    verify_claire_adding_a_child
+    # verify_claire_adding_a_child
 
-    verify_claire_losing_a_child
+    # verify_claire_losing_a_child
 
-    #verify_vanessa_losing_a_parent
+    verify_rudy_losing_a_parent
   end
 
   protected
   def verify_initial_relations_for_family
+    # We are not storing the RELS-EXT entry on the "container" collection
     assert_rels_ext(
       @family,
       :has_family_members,
+      []
+    )
+    assert_rels_ext(
+      @family,
+      :has_members,
+      []
+    )
+
+    # However, we do have access to Family#family_members
+    assert_active_fedora_has_many(
+      @family,
+      :family_members,
+      [@theo,@claire, heathcliff,rudy, vanessa]
+    )
+
+    assert_active_fedora_has_many(
+      @family,
+      :child_collections,
       [@theo,@claire, heathcliff,rudy, vanessa]
     )
   end
@@ -147,7 +166,8 @@ describe CommonRepositoryModel::Collection do
   end
 
   def verify_initial_relations_for_claire
-    assert_rels_ext @claire, :is_parent_of, [@theo,vanessa,rudy]
+    assert_rels_ext @claire, :is_parent_of, []
+    assert_rels_ext @claire, :is_child_of, []
     assert_rels_ext @claire, :is_family_member_of, [family]
     assert_rels_ext @claire, :is_member_of, [family]
 
@@ -168,11 +188,16 @@ describe CommonRepositoryModel::Collection do
     @claire.save
     @claire = @claire.class.find(@claire.pid)
 
-    assert_rels_ext @claire, :is_parent_of, [@theo,vanessa,rudy, sandra]
+    assert_rels_ext @claire, :is_parent_of, []
+    assert_rels_ext @claire, :is_child_of, []
 
+    assert_active_fedora_has_many(@claire,:parents,[])
     assert_active_fedora_has_many(@claire,:children,[theo, rudy, vanessa,sandra])
     assert_active_fedora_has_many(
       @claire,:child_collections,[theo, rudy, vanessa, sandra]
+    )
+    assert_active_fedora_has_many(
+      @claire,:parent_collections,[family]
     )
   end
 
@@ -203,19 +228,30 @@ describe CommonRepositoryModel::Collection do
 
   end
 
-  def verify_vanessa_losing_a_parent
-    # rudy.parents = [claire]
-    rudy.parents.delete(heathcliff)
-    rudy.save.must_equal true
+  def verify_rudy_losing_a_parent
+    assert_rels_ext @rudy, :is_child_of, [heathcliff,claire]
+    assert_rels_ext @rudy, :is_member_of, [heathcliff,claire,family]
+    assert_active_fedora_has_many @rudy, :parents, [heathcliff,claire]
+    assert_active_fedora_has_many(
+      @rudy, :parent_collections, [heathcliff,claire,family]
+    )
 
-    reloaded_rudy = rudy.class.find(rudy.pid)
-    require 'debugger'; debugger; true
+    @rudy.parents = [claire]
+    @rudy.save.must_equal true
+
+    assert_active_fedora_has_many(@rudy, :parents, [claire])
+    assert_active_fedora_has_many(
+      @rudy, :parent_collections, [claire, family]
+    )
+    assert_rels_ext @rudy, :is_child_of, [claire]
+    assert_rels_ext @rudy, :is_member_of, [claire, family]
+
+    reloaded_rudy = @rudy.class.find(@rudy.pid)
+
     assert_rels_ext reloaded_rudy, :is_child_of, [claire]
     assert_rels_ext reloaded_rudy, :is_member_of, [claire, family]
 
-    assert_active_fedora_has_many(
-      reloaded_rudy, :parents, [claire]
-    )
+    assert_active_fedora_has_many(reloaded_rudy, :parents, [claire])
 
     assert_active_fedora_has_many(
       reloaded_rudy, :parent_collections, [claire, family]

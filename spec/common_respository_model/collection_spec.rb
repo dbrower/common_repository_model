@@ -41,7 +41,8 @@ describe CommonRepositoryModel::Collection do
       @collection = subject.class.find(subject.pid)
       @child_collection = child_collection.class.find(child_collection.pid)
 
-      assert_rels_ext(@collection, :has_members, [@child_collection])
+      # We shouldn't store any child relations
+      assert_rels_ext(@collection, :has_members, [])
       assert_active_fedora_has_many(
         @collection, :child_collections, [@child_collection]
       )
