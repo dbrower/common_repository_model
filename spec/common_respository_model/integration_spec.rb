@@ -111,6 +111,12 @@ describe CommonRepositoryModel::Collection do
     verify_initial_relations_for_theo
     verify_initial_relations_for_claire
     verify_initial_relations_for_dress
+
+    verify_claire_adding_a_child
+
+    verify_claire_losing_a_child
+
+    #verify_vanessa_losing_a_parent
   end
 
   protected
@@ -140,7 +146,7 @@ describe CommonRepositoryModel::Collection do
     assert_active_fedora_belongs_to(@dress, :collection, @claire)
   end
 
-  def verify_initial_relations_for_clair
+  def verify_initial_relations_for_claire
     assert_rels_ext @claire, :is_parent_of, [@theo,vanessa,rudy]
     assert_rels_ext @claire, :is_family_member_of, [family]
     assert_rels_ext @claire, :is_member_of, [family]
@@ -153,5 +159,67 @@ describe CommonRepositoryModel::Collection do
       @claire,:child_collections,[theo, rudy, vanessa]
     )
     assert_active_fedora_has_many(@claire,:parent_collections,[family])
+  end
+
+  def verify_claire_adding_a_child
+    sandra = Person.new
+    sandra.save
+    @claire.children << sandra
+    @claire.save
+    @claire = @claire.class.find(@claire.pid)
+
+    assert_rels_ext @claire, :is_parent_of, [@theo,vanessa,rudy, sandra]
+
+    assert_active_fedora_has_many(@claire,:children,[theo, rudy, vanessa,sandra])
+    assert_active_fedora_has_many(
+      @claire,:child_collections,[theo, rudy, vanessa, sandra]
+    )
+  end
+
+  def verify_claire_losing_a_child
+    @claire.children = [theo,rudy]
+    @claire.save
+
+    assert_active_fedora_has_many(@claire,:children,[theo, rudy])
+    assert_active_fedora_has_many(
+      @claire,:child_collections,[theo, rudy]
+    )
+
+    reloaded_vanessa = vanessa.class.find(vanessa.pid)
+
+    # Note, just because we said Claire was not Vanessa's parent, Vanessa did
+    # not update
+    assert_rels_ext reloaded_vanessa, :is_child_of, [claire, heathcliff]
+    assert_rels_ext(
+      reloaded_vanessa, :is_member_of, [claire, heathcliff, family]
+    )
+
+    assert_active_fedora_has_many(
+      reloaded_vanessa, :parents, [claire, heathcliff]
+    )
+    assert_active_fedora_has_many(
+      reloaded_vanessa, :parent_collections, [claire,heathcliff, family]
+    )
+
+  end
+
+  def verify_vanessa_losing_a_parent
+    # rudy.parents = [claire]
+    rudy.parents.delete(heathcliff)
+    rudy.save.must_equal true
+
+    reloaded_rudy = rudy.class.find(rudy.pid)
+    require 'debugger'; debugger; true
+    assert_rels_ext reloaded_rudy, :is_child_of, [claire]
+    assert_rels_ext reloaded_rudy, :is_member_of, [claire, family]
+
+    assert_active_fedora_has_many(
+      reloaded_rudy, :parents, [claire]
+    )
+
+    assert_active_fedora_has_many(
+      reloaded_rudy, :parent_collections, [claire, family]
+    )
+
   end
 end
