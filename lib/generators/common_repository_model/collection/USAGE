@@ -1,0 +1,9 @@
+Description:
+  This generator provides a means of creating a service
+
+Example:
+  rails generate service ChickenPieService
+
+  This will create:
+    app/services/chicken_pie_service.rb
+    spec/services/chicken_pie_service_spec.rb
