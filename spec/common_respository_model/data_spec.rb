@@ -7,6 +7,20 @@ describe CommonRepositoryModel::Data do
 
   describe 'integration' do
     let(:collection) { CommonRepositoryModel::Collection.new }
+    let(:file_1) { File.new(__FILE__) }
+    let(:file_2) {
+      File.new(File.join(File.dirname(__FILE__), '../spec_helper.rb'))
+    }
+    it 'should have content versions' do
+      subject.content = file_1
+      subject.save
+      subject.content.content.must_equal file_1.read
+      subject.content = file_2
+      subject.save
+      subject.content.content.must_equal file_2.read
+      subject.content.versions.count.must_equal 2
+    end
+
     it 'should save' do
       # Before we can add a collection, the containing object
       # must be saved
