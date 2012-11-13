@@ -11,7 +11,22 @@ describe CommonRepositoryModel::Collection do
     subject.must_respond_to(:area_id)
     subject.must_respond_to(:area_id=)
   end
+  describe '#is_data_slot_name_empty?' do
+    it 'returns false when slot is occupied' do
+      subject.data.build(slot_name: 'Chicken')
+      subject.is_data_slot_name_empty?('Chicken').must_equal false
+    end
 
+    it 'returns true when slot is empty' do
+      subject.is_data_slot_name_empty?('Chicken A La King').must_equal true
+    end
+
+    it 'does not cross the streams' do
+      collection = CommonRepositoryModel::Collection.new
+      subject.data.build(slot_name: 'Balloon')
+      collection.is_data_slot_name_empty?('Balloon')
+    end
+  end
   it 'has many data' do
     subject.data.build.must_be_kind_of(CommonRepositoryModel::Data)
   end

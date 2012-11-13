@@ -85,5 +85,9 @@ module CommonRepositoryModel
       class_name: 'CommonRepositoryModel::Data',
       property: :is_part_of
     )
+
+    def is_data_slot_name_empty?(slot_name)
+      !data.detect {|d| d.slot_name == slot_name }
+    end
   end
 end
