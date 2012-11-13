@@ -3,7 +3,7 @@ require 'common_repository_model/data'
 
 describe CommonRepositoryModel::Data do
 
-  subject { CommonRepositoryModel::Data.new }
+  subject { CommonRepositoryModel::Data.new(data_type: '1234') }
 
   describe 'integration' do
     let(:collection) { CommonRepositoryModel::Collection.new }
@@ -11,6 +11,12 @@ describe CommonRepositoryModel::Data do
     let(:file_2) {
       File.new(File.join(File.dirname(__FILE__), '../spec_helper.rb'))
     }
+
+    it 'should have #data_type' do
+      subject.must_respond_to :data_type
+      subject.must_respond_to :data_type=
+    end
+
     it 'should have content versions' do
       subject.content = file_1
       subject.save
