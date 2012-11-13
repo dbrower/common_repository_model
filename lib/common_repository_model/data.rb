@@ -15,10 +15,10 @@ class CommonRepositoryModel::Data < CommonRepositoryModel::PersistenceBase
   )
 
   has_metadata name: "properties", type: ActiveFedora::SimpleDatastream do |m|
-    m.field :data_type, :string
+    m.field :slot_name, :string
   end
-  delegate :data_type, unique: true, to: :properties
-  validates :data_type, presence: true
+  delegate :slot_name, unique: true, to: :properties
+  validates :slot_name, presence: true
 
   def content=(file)
     add_file_datastream(file, dsid: "content")

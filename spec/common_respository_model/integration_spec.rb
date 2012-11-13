@@ -62,7 +62,7 @@ describe CommonRepositoryModel::Collection do
   let(:theo) { Person.new }
   let(:vanessa) { Person.new }
   let(:rudy) { Person.new }
-  let(:dress) { Clothing.new }
+  let(:dress) { Clothing.new(slot_name: 'outerwear') }
 
   before(:all) do
     family.save
