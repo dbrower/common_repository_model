@@ -16,8 +16,10 @@ class CommonRepositoryModel::Data < CommonRepositoryModel::PersistenceBase
 
   has_metadata name: "properties", type: ActiveFedora::SimpleDatastream do |m|
     m.field :slot_name, :string
+    m.field :md5_checksum, :string
   end
   delegate :slot_name, unique: true, to: :properties
+  delegate :md5_checksum, unique: true, to: :properties
   validates :slot_name, presence: true
 
   def content=(file)

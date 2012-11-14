@@ -3,7 +3,12 @@ require 'common_repository_model/data'
 
 describe CommonRepositoryModel::Data do
 
-  subject { CommonRepositoryModel::Data.new(slot_name: '1234') }
+  subject {
+    CommonRepositoryModel::Data.new(
+      slot_name: '1234',
+      md5_checksum: 'abcdefg'
+    )
+  }
 
   describe 'integration' do
     let(:collection) { CommonRepositoryModel::Collection.new }
@@ -15,6 +20,11 @@ describe CommonRepositoryModel::Data do
     it 'should have #slot_name' do
       subject.must_respond_to :slot_name
       subject.must_respond_to :slot_name=
+    end
+
+    it 'should have #md5_checksum' do
+      subject.must_respond_to :md5_checksum
+      subject.must_respond_to :md5_checksum=
     end
 
     it 'should have content versions' do
