@@ -16,5 +16,8 @@ module CommonRepositoryModel
     validates :name, presence: true
 
     delegate_to 'properties', [:name], unique: true
+
+    # We shouldn't be calling these
+    protected :save, :save!
   end
 end
