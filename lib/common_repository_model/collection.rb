@@ -86,8 +86,10 @@ module CommonRepositoryModel
       property: :is_part_of
     )
 
-    def is_data_slot_name_empty?(slot_name)
-      !data.detect {|d| d.slot_name == slot_name }
+    def find_or_build_data_for_given_slot_names(slot_names)
+      slot_names.collect { |name|
+        data.detect { |d| d.slot_name == name } || data.build(slot_name: name)
+      }
     end
   end
 end
