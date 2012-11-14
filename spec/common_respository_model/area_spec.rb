@@ -4,11 +4,11 @@ require 'common_repository_model/collection'
 
 describe CommonRepositoryModel::Area do
 
-  subject { CommonRepositoryModel::Area.new(area_name: area_name) }
-  let(:area_name) { 'My Area Name'}
+  subject { CommonRepositoryModel::Area.new(name: name) }
+  let(:name) { 'My Area Name'}
 
-  it 'should have #area_name' do
-    subject.area_name.must_equal area_name
+  it 'should have #name' do
+    subject.name.must_equal name
   end
 
   describe 'has_many #collections' do

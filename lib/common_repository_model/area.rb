@@ -10,9 +10,9 @@ module CommonRepositoryModel
     )
 
     has_metadata(name: "properties",type: ActiveFedora::SimpleDatastream) do |m|
-      m.field 'area_name', :string
+      m.field 'name', :string
     end
 
-    delegate_to 'properties', [:area_name], unique: true
+    delegate_to 'properties', [:name], unique: true
   end
 end
