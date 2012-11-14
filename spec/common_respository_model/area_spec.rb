@@ -7,6 +7,12 @@ describe CommonRepositoryModel::Area do
   subject { CommonRepositoryModel::Area.new(name: name) }
   let(:name) { 'My Area Name'}
 
+  it 'should require a #name' do
+    subject.name = nil
+    subject.valid?.must_equal false
+    subject.name = name
+    subject.valid?.must_equal true
+  end
   it 'should have #name' do
     subject.name.must_equal name
   end

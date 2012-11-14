@@ -13,6 +13,8 @@ module CommonRepositoryModel
       m.field 'name', :string
     end
 
+    validates :name, presence: true
+
     delegate_to 'properties', [:name], unique: true
   end
 end
