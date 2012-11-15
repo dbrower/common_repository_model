@@ -17,6 +17,10 @@ module CommonRepositoryModel
 
     delegate_to 'properties', [:name], unique: true
 
+    def self.find_by_name(name)
+      find({name_s: name}).first
+    end
+
     # We shouldn't be calling these
     protected :save, :save!
   end

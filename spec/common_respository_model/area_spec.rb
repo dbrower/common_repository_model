@@ -3,10 +3,8 @@ require 'common_repository_model/area'
 require 'common_repository_model/collection'
 
 describe CommonRepositoryModel::Area do
-  describe 'meta test' do
-    it {
-      FactoryGirl.create(:area).persisted?.must_equal true
-    }
+  after(:each) do
+    subject.delete if subject.persisted?
   end
 
   describe 'without persisting' do
@@ -37,7 +35,12 @@ describe CommonRepositoryModel::Area do
 
   describe 'integration (with persistence)' do
     subject { FactoryGirl.create(:area) }
-    let(:collection) { FactoryGirl.build(:collection) }
+    let(:collection) { FactoryGirl.build(:collection, area: nil) }
+    it 'should find by name' do
+      CommonRepositoryModel::Area.find_by_name(subject.name).must_equal subject
+      CommonRepositoryModel::Area.
+        find_by_name("#{subject.name}-tmp").must_equal nil
+    end
     it 'should save' do
       # Before we can add a collection, the containing object
       # must be saved

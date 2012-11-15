@@ -53,6 +53,9 @@ class Person < CommonRepositoryModel::Collection
 end
 
 describe CommonRepositoryModel::Collection do
+  after(:each) do
+    area.delete if area.persisted?
+  end
   let(:area) { FactoryGirl.create(:area) }
   let(:family) { Family.new(area: area) }
   let(:lawyer) { Job.new(area: area) }

@@ -11,6 +11,14 @@ ActiveFedora.init(
 
 
 class MiniTest::Unit::TestCase
+
+  def with_persisted_area
+    area = FactoryGirl.create(:area)
+    yield(area)
+  ensure
+    area.delete
+  end
+
   def assert_rels_ext(subject, predicate, objects = [])
     assert_equal objects.count, subject.relationships(predicate).count
     objects.each do |object|

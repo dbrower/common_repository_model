@@ -2,7 +2,6 @@ require_relative '../spec_helper'
 require 'common_repository_model/data'
 
 describe CommonRepositoryModel::Data do
-
   subject { FactoryGirl.build(:data) }
 
   describe 'integration' do
@@ -15,12 +14,12 @@ describe CommonRepositoryModel::Data do
     it 'should have #slot_name' do
       subject.must_respond_to :slot_name
       subject.must_respond_to :slot_name=
-    end
+        end
 
     it 'should have #md5_checksum' do
       subject.must_respond_to :md5_checksum
       subject.must_respond_to :md5_checksum=
-    end
+        end
 
     it 'should have content versions' do
       subject.content = file_1
@@ -33,16 +32,20 @@ describe CommonRepositoryModel::Data do
     end
 
     it 'should save' do
-      # Before we can add a collection, the containing object
-      # must be saved
-      collection.save
-      subject.collection = collection
-      subject.save
+      with_persisted_area do |area|
+        collection.area = area
+        # Before we can add a collection, the containing object
+        # must be saved
+        collection.save!
+        subject.collection = collection
+        subject.save!
 
-      @subject = subject.class.find(subject.pid)
+        @subject = subject.class.find(subject.pid)
 
-      assert_rels_ext(@subject, :is_part_of, [collection])
-      assert_active_fedora_belongs_to(@subject, :collection, collection)
+        assert_rels_ext(@subject, :is_part_of, [collection])
+        assert_active_fedora_belongs_to(@subject, :collection, collection)
+
+      end
     end
   end
 end
