@@ -47,21 +47,37 @@ describe CommonRepositoryModel::Collection do
 
 
   describe 'integration' do
-    after(:each) do
-      begin
-        subject.area.delete if subject.area.persisted?
-      rescue
+    let(:child_collection) { FactoryGirl.build(:collection, area: nil) }
+    it 'should keep a child collection in the parent collection' do
+      with_persisted_area do |area_1|
+        with_persisted_area do |area_2|
+          area_1.wont_equal area_2
+
+          subject.area = area_1
+          subject.save!
+
+          child_collection.area = area_2
+
+          child_collection.parent_collections += [subject]
+
+          child_collection.area.must_equal subject.area
+
+          child_collection.save!
+
+          child_collection.area.must_equal subject.area
+        end
       end
     end
-    let(:child_collection) { FactoryGirl.build(:collection) }
     it 'should handle parent/child collection' do
       # Before we can add a collection, the containing object
       # must be saved
       with_persisted_area do |area|
         subject.area = area
-        subject.save.must_equal true
+        child_collection.area = area
+        subject.save!
         subject.child_collections << child_collection
-        subject.save.must_equal true
+        subject.save!
+
         @collection = subject.class.find(subject.pid)
         @child_collection = child_collection.class.find(child_collection.pid)
 

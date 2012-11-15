@@ -59,7 +59,10 @@ module CommonRepositoryModel
       has_and_belongs_to_many(method_name, options)
     end
 
-    def save
+    before_save :register_parent_and_collections
+    def register_parent_and_collections
+      self.__area = CommonRepositoryModel::Area.find(area.pid) if area
+
       collected_has_members = membership_registry.has_members.
       collect do |association_name|
         public_send(association_name)
@@ -73,11 +76,36 @@ module CommonRepositoryModel
 
       self.parent_collections = collected_is_member_of
 
-      super
+      true
+    end
+    protected :register_parent_and_collections
+
+    def is_root?
+      parent_collections.size == 0
+    end
+
+    def parent_areas
+      parent_collections.collect(&:__area).uniq
+    end
+
+    def area=(an_area)
+      if is_root?
+        self.__area = an_area
+      else
+        self.__area = parent_areas.first
+      end
+    end
+
+    def area
+      if is_root?
+        __area
+      else
+        parent_areas.first
+      end
     end
 
     belongs_to(
-      :area,
+      :__area,
       class_name:'CommonRepositoryModel::Area',
       property: :is_member_of_area
     )
