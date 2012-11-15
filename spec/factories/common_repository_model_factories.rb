@@ -11,5 +11,7 @@ FactoryGirl.define do
     area { CommonRepositoryModel::Area.all.first }
   end
   factory :data, class: CommonRepositoryModel::Data do
+    sequence(:slot_name) { |n| "Slot Name #{n}" }
+    sequence(:md5_checksum) { |n| "#{n}abc"}
   end
 end

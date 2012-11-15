@@ -3,15 +3,10 @@ require 'common_repository_model/data'
 
 describe CommonRepositoryModel::Data do
 
-  subject {
-    CommonRepositoryModel::Data.new(
-      slot_name: '1234',
-      md5_checksum: 'abcdefg'
-    )
-  }
+  subject { FactoryGirl.build(:data) }
 
   describe 'integration' do
-    let(:collection) { CommonRepositoryModel::Collection.new }
+    let(:collection) { FactoryGirl.build(:collection) }
     let(:file_1) { File.new(__FILE__) }
     let(:file_2) {
       File.new(File.join(File.dirname(__FILE__), '../spec_helper.rb'))

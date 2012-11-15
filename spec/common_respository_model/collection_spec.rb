@@ -3,7 +3,7 @@ require 'common_repository_model/collection'
 
 describe CommonRepositoryModel::Collection do
 
-  subject { CommonRepositoryModel::Collection.new }
+  subject { FactoryGirl.build(:collection) }
 
   it 'should belong_to #area' do
     subject.must_respond_to(:area)
@@ -46,7 +46,7 @@ describe CommonRepositoryModel::Collection do
 
 
   describe 'integration' do
-    let(:child_collection) { CommonRepositoryModel::Collection.new }
+    let(:child_collection) { FactoryGirl.build(:collection) }
     it 'should handle parent/child collection' do
       # Before we can add a collection, the containing object
       # must be saved
