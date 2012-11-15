@@ -53,15 +53,15 @@ class Person < CommonRepositoryModel::Collection
 end
 
 describe CommonRepositoryModel::Collection do
-
-  let(:family) { Family.new }
-  let(:lawyer) { Job.new }
-  let(:doctor) { Job.new }
-  let(:heathcliff) { Person.new }
-  let(:claire) { Person.new }
-  let(:theo) { Person.new }
-  let(:vanessa) { Person.new }
-  let(:rudy) { Person.new }
+  let(:area) { FactoryGirl.create(:area) }
+  let(:family) { Family.new(area: area) }
+  let(:lawyer) { Job.new(area: area) }
+  let(:doctor) { Job.new(area: area) }
+  let(:heathcliff) { Person.new(area: area) }
+  let(:claire) { Person.new(area: area) }
+  let(:theo) { Person.new(area: area) }
+  let(:vanessa) { Person.new(area: area) }
+  let(:rudy) { Person.new(area: area) }
   let(:dress) { Clothing.new(slot_name: 'outerwear') }
 
   before(:all) do
@@ -107,14 +107,14 @@ describe CommonRepositoryModel::Collection do
   end
 
   it 'verifies complicated relationships' do
-    # verify_initial_relations_for_family
-    # verify_initial_relations_for_theo
-    # verify_initial_relations_for_claire
-    # verify_initial_relations_for_dress
+    verify_initial_relations_for_family
+    verify_initial_relations_for_theo
+    verify_initial_relations_for_claire
+    verify_initial_relations_for_dress
 
-    # verify_claire_adding_a_child
+    verify_claire_adding_a_child
 
-    # verify_claire_losing_a_child
+    verify_claire_losing_a_child
 
     verify_rudy_losing_a_parent
   end
@@ -182,7 +182,7 @@ describe CommonRepositoryModel::Collection do
   end
 
   def verify_claire_adding_a_child
-    sandra = Person.new
+    sandra = Person.new(area: area)
     sandra.save
     @claire.children << sandra
     @claire.save

@@ -5,6 +5,13 @@ describe CommonRepositoryModel::Collection do
 
   subject { FactoryGirl.build(:collection) }
 
+  it 'should require an area' do
+    subject.area.must_be_kind_of(CommonRepositoryModel::Area)
+    subject.valid?.must_equal true
+    subject.area = nil
+    subject.valid?.must_equal false
+  end
+
   it 'should belong_to #area' do
     subject.must_respond_to(:area)
     subject.must_respond_to(:area=)

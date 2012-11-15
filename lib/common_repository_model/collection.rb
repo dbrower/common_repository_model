@@ -3,6 +3,20 @@ require_relative './area'
 require_relative './data'
 require 'set'
 
+class PersistedValidator < ActiveModel::EachValidator
+  def validate_each(record, attribute, value)
+    is_valid = true
+    is_valid = false if value.nil?
+    begin
+      is_valid = false unless value.persisted?
+    rescue NoMethodError
+      is_valid = false
+    end
+
+    record.errors.add(attribute, 'must be persisted') unless is_valid
+    is_valid
+  end
+end
 module CommonRepositoryModel
   class MembershipRegistry
     def initialize
@@ -67,6 +81,8 @@ module CommonRepositoryModel
       class_name:'CommonRepositoryModel::Area',
       property: :is_member_of_area
     )
+
+    validates :area, presence: true, persisted: true
 
     has_many(
       :child_collections,
