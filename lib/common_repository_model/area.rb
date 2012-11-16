@@ -25,7 +25,7 @@ module CommonRepositoryModel
       find({name_s: name.to_s}).first ||
       raise(
         CommonRepositoryModel::ObjectNotFoundError.new(
-          "#{self.class} with name: #{name.to_s} not found"
+          "#{self} with name: #{name.to_s} not found"
         )
       )
     end
