@@ -21,6 +21,15 @@ module CommonRepositoryModel
       find({name_s: name}).first
     end
 
+    def self.find_by_name!(name)
+      find({name_s: name.to_s}).first ||
+      raise(
+        CommonRepositoryModel::ObjectNotFoundError.new(
+          "#{self.class} with name: #{name.to_s} not found"
+        )
+      )
+    end
+
     # We shouldn't be calling these
     protected :save, :save!
   end

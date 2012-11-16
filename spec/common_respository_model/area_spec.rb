@@ -3,10 +3,6 @@ require 'common_repository_model/area'
 require 'common_repository_model/collection'
 
 describe CommonRepositoryModel::Area do
-  after(:each) do
-    subject.delete if subject.persisted?
-  end
-
   describe 'without persisting' do
     subject { FactoryGirl.build(:area, name: name) }
     let(:name) { 'My Area Name'}
@@ -34,21 +30,28 @@ describe CommonRepositoryModel::Area do
   end
 
   describe 'integration (with persistence)' do
-    subject { FactoryGirl.create(:area) }
     let(:collection) { FactoryGirl.build(:collection, area: nil) }
-    it 'should find by name' do
-      CommonRepositoryModel::Area.find_by_name(subject.name).must_equal subject
-      CommonRepositoryModel::Area.
-        find_by_name("#{subject.name}-tmp").must_equal nil
+    it 'should .find_by_name and .find_by_name!' do
+      with_persisted_area do |area|
+        CommonRepositoryModel::Area.find_by_name(area.name).must_equal area
+        CommonRepositoryModel::Area.
+          find_by_name("#{area.name}-tmp").must_equal nil
+
+        CommonRepositoryModel::Area.find_by_name!(area.name).must_equal area
+        lambda {
+          CommonRepositoryModel::Area.find_by_name!("#{area.name}-tmp")
+        }.must_raise(CommonRepositoryModel::ObjectNotFoundError)
+      end
     end
     it 'should save' do
-      # Before we can add a collection, the containing object
-      # must be saved
-      subject.collections << collection
-      subject.send(:save).must_equal true
-      new_subject = subject.class.find(subject.pid)
-
-      new_subject.collections.size.must_equal 1
+      with_persisted_area do |area|
+        # Before we can add a collection, the containing object
+        # must be saved
+        area.collections << collection
+        area.send(:save).must_equal true
+        new_area = area.class.find(area.pid)
+        new_area.collections.size.must_equal 1
+      end
     end
   end
 end
