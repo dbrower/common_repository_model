@@ -1,0 +1,30 @@
+namespace :common_repository_model do
+  desc "Create an Area in the CommonRepositoryModel.
+        You will be prompted for a name"
+  task :create_area => :environment do
+    require 'highline'
+    highline = HighLine.new
+    prompt_message = "Area Name to Create in Fedora:"
+    area_name = highline.ask(prompt_message)
+    verified_area_name = highline.ask("Verify #{prompt_message}")
+    if area_name != verified_area_name
+      message = "Area Name and Verified Area Name do not match:"
+      message << "\n\t#{area_name}\n\t#{verified_area_name}"
+      $stderr.puts("\n\n\n#{message}\n\n\n")
+      raise RuntimeError, message
+    elsif area_name.to_s.strip.size == 0
+      message = "Area Name cannot be blank"
+      $stderr.puts("\n\n\n#{message}\n\n\n")
+      raise RuntimeError, message
+    else
+      require 'common_repository_model/area'
+      if area = CommonRepositoryModel::Area.find_by_name(area_name)
+        $stdout.puts(
+          "\n\n\nArea Name #{area_name} already exists as PID: #{area.pid}\n\n"
+        )
+      else
+        CommonRepositoryModel::Area.new(name: area_name).send(:save!)
+      end
+    end
+  end
+end
