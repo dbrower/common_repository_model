@@ -18,11 +18,11 @@ module CommonRepositoryModel
     delegate_to 'properties', [:name], unique: true
 
     def self.find_by_name(name)
-      find({name_s: name}).first
+      find({'name_s' => name}).first
     end
 
     def self.find_by_name!(name)
-      find({name_s: name.to_s}).first ||
+      find_by_name(name) ||
       raise(
         CommonRepositoryModel::ObjectNotFoundError.new(
           "#{self} with name: #{name.to_s} not found"
