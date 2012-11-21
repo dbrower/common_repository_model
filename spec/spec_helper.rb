@@ -16,7 +16,7 @@ class MiniTest::Unit::TestCase
     area = FactoryGirl.create(:area)
     yield(area)
   ensure
-    area.delete
+    area.delete if area
   end
 
   def assert_rels_ext(subject, predicate, objects = [])
