@@ -18,8 +18,8 @@ class CommonRepositoryModel::Data < CommonRepositoryModel::PersistenceBase
     m.field :slot_name, :string
     m.field :md5_checksum, :string
   end
-  delegate :slot_name, unique: true, to: :properties
-  delegate :md5_checksum, unique: true, to: :properties
+  register_attribute :slot_name, unique: true, to: :properties
+  register_attribute :md5_checksum, unique: true, to: :properties
   validates :slot_name, presence: true
 
   def content=(file)

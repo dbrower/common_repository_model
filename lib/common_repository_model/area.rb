@@ -15,7 +15,7 @@ module CommonRepositoryModel
 
     validates :name, presence: true
 
-    delegate_to 'properties', [:name], unique: true
+    register_attribute :name, to: 'properties', unique: true
 
     def self.find_by_name(name)
       find({'name_s' => name}).first

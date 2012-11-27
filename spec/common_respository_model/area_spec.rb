@@ -7,6 +7,11 @@ describe CommonRepositoryModel::Area do
     subject { FactoryGirl.build(:area, name: name) }
     let(:name) { 'My Area Name'}
 
+    it 'should serialize' do
+      subject.as_json.fetch(:name).must_equal name
+      subject.as_json.fetch(:pid).must_be_kind_of String
+    end
+
     it 'should find or create by #name' do
       lambda { subject.save }.must_raise(NoMethodError)
       lambda { subject.save! }.must_raise(NoMethodError)

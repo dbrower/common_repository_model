@@ -5,4 +5,8 @@ describe CommonRepositoryModel::PersistenceBase do
 
   subject { CommonRepositoryModel::PersistenceBase.new }
 
+  it 'should gracefully handle as_json' do
+    subject.as_json.fetch(:pid)
+  end
+
 end

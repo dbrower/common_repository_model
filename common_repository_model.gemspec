@@ -22,6 +22,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_dependency "activesupport", "~>3.2"
+  gem.add_dependency "active_model_serializers"
   gem.add_dependency "activemodel", "~>3.2"
   gem.add_dependency "builder", "~>3.0"
   gem.add_runtime_dependency "minitest"

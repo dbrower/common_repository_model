@@ -4,6 +4,11 @@ require 'common_repository_model/data'
 describe CommonRepositoryModel::Data do
   subject { FactoryGirl.build(:data) }
 
+  it 'should have friendly #as_json' do
+    subject.as_json.fetch(:slot_name).must_equal subject.slot_name
+    subject.as_json.fetch(:md5_checksum).must_equal subject.md5_checksum
+  end
+
   describe 'integration' do
     let(:collection) { FactoryGirl.build(:collection) }
     let(:file_1) { File.new(__FILE__) }
@@ -13,13 +18,13 @@ describe CommonRepositoryModel::Data do
 
     it 'should have #slot_name' do
       subject.must_respond_to :slot_name
-      subject.must_respond_to :slot_name=
-        end
+      subject.must_respond_to(:slot_name=)
+    end
 
     it 'should have #md5_checksum' do
-      subject.must_respond_to :md5_checksum
-      subject.must_respond_to :md5_checksum=
-        end
+      subject.must_respond_to( :md5_checksum)
+      subject.must_respond_to(:md5_checksum=)
+    end
 
     it 'should have content versions' do
       subject.content = file_1
