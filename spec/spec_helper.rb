@@ -9,15 +9,9 @@ ActiveFedora.init(
   environment: :test
 )
 
-
+require 'common_repository_model/test_support'
 class MiniTest::Unit::TestCase
-
-  def with_persisted_area
-    area = FactoryGirl.create(:area)
-    yield(area)
-  ensure
-    area.delete if area
-  end
+  include CommonRepositoryModel::TestSupport
 
   def assert_rels_ext(subject, predicate, objects = [])
     assert_equal objects.count, subject.relationships(predicate).count

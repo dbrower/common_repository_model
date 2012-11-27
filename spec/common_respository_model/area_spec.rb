@@ -4,7 +4,7 @@ require 'common_repository_model/collection'
 
 describe CommonRepositoryModel::Area do
   describe 'without persisting' do
-    subject { FactoryGirl.build(:area, name: name) }
+    subject { FactoryGirl.build(:common_repository_model_area, name: name) }
     let(:name) { 'My Area Name'}
 
     it 'should serialize' do
