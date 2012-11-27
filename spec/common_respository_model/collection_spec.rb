@@ -3,8 +3,16 @@ require 'common_repository_model/collection'
 
 describe CommonRepositoryModel::Collection do
   subject { FactoryGirl.build(:collection) }
+  it 'should have #named_area_finder' do
+    lambda {
+      subject.named_area_finder.call('NEVER-GONNA_EXIST')
+    }.must_raise CommonRepositoryModel::ObjectNotFoundError
+  end
+
   it 'should require an area' do
     with_persisted_area do |area|
+      subject.named_area_finder.call(area.name)
+
       subject.area = area
       subject.area.must_be_kind_of(CommonRepositoryModel::Area)
       subject.valid?.must_equal true

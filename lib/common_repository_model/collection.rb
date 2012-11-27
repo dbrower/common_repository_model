@@ -2,6 +2,7 @@ require_relative './persistence_base'
 require_relative './area'
 require_relative './data'
 require 'set'
+require 'morphine'
 
 class PersistedValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
@@ -102,6 +103,11 @@ module CommonRepositoryModel
       else
         parent_areas.first
       end
+    end
+
+    include Morphine
+    register :named_area_finder do
+      CommonRepositoryModel::Area.method(:find_by_name!)
     end
 
     belongs_to(
