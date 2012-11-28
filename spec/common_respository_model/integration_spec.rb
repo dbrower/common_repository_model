@@ -53,27 +53,35 @@ class Person < CommonRepositoryModel::Collection
 end
 
 describe CommonRepositoryModel::Collection do
-  after(:each) do
-    area.delete if area.persisted?
-  end
-  let(:area) {
-    FactoryGirl.create(
-      :common_repository_model_area,
-      name: Family.new.name_of_area_to_assign
-    )
-  }
-  let(:family) { Family.new(area: area) }
-  let(:lawyer) { Job.new(area: area) }
-  let(:doctor) { Job.new(area: area) }
-  let(:heathcliff) { Person.new(area: area) }
-  let(:claire) { Person.new(area: area) }
-  let(:theo) { Person.new(area: area) }
-  let(:vanessa) { Person.new(area: area) }
-  let(:rudy) { Person.new(area: area) }
+  let(:family) { Family.new }
+  let(:lawyer) { Job.new }
+  let(:doctor) { Job.new }
+  let(:heathcliff) { Person.new }
+  let(:claire) { Person.new }
+  let(:theo) { Person.new }
+  let(:vanessa) { Person.new }
+  let(:rudy) { Person.new }
   let(:dress) { Clothing.new(slot_name: 'outerwear') }
 
-  before(:all) do
-    family.save
+  it 'verifies complicated relationships' do
+    with_persisted_area(Family.new.name_of_area_to_assign) do |area|
+      setup_variables
+      verify_initial_relations_for_family
+      verify_initial_relations_for_theo
+      verify_initial_relations_for_claire
+      verify_initial_relations_for_dress
+
+      verify_claire_adding_a_child
+
+      verify_claire_losing_a_child
+
+      verify_rudy_losing_a_parent
+    end
+  end
+
+  protected
+  def setup_variables
+        family.save
 
     lawyer.save
     doctor.save
@@ -113,21 +121,6 @@ describe CommonRepositoryModel::Collection do
     @claire = claire.class.find(claire.pid)
     @rudy = rudy.class.find(rudy.pid)
   end
-
-  it 'verifies complicated relationships' do
-    verify_initial_relations_for_family
-    verify_initial_relations_for_theo
-    verify_initial_relations_for_claire
-    verify_initial_relations_for_dress
-
-    verify_claire_adding_a_child
-
-    verify_claire_losing_a_child
-
-    verify_rudy_losing_a_parent
-  end
-
-  protected
   def verify_initial_relations_for_family
     # We are not storing the RELS-EXT entry on the "container" collection
     assert_rels_ext(
@@ -190,7 +183,7 @@ describe CommonRepositoryModel::Collection do
   end
 
   def verify_claire_adding_a_child
-    sandra = Person.new(area: area)
+    sandra = Person.new
     sandra.save
     @claire.children << sandra
     @claire.save

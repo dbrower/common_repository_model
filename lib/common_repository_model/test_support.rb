@@ -24,7 +24,9 @@ module CommonRepositoryModel
     def with_persisted_area(name = nil)
       options = {}
       options[:name] = name if name
-      area = FactoryGirl.create(:common_repository_model_area, options)
+      area = nil
+      area = CommonRepositoryModel::Area.find_by_name(name) if name
+      area ||= FactoryGirl.create(:common_repository_model_area, options)
       yield(area)
     ensure
       area.delete if area

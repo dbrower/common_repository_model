@@ -104,20 +104,15 @@ module CommonRepositoryModel
       parent_collections.collect(&:__area).uniq
     end
 
-    def area=(an_area)
-      if is_root?
-        self.__area = an_area
-      else
-        self.__area = parent_areas.first
-      end
-    end
-
     def area
       if is_root?
         __area
       else
         parent_areas.first
-      end
+      end ||
+      CommonRepositoryModel::Area.find_by_name!(name_of_area_to_assign)
+    rescue CommonRepositoryModel::ObjectNotFoundError
+      nil
     end
 
     def area_name

@@ -33,7 +33,7 @@ describe CommonRepositoryModel::Data do
 
     it 'should save' do
       with_persisted_area(collection.name_of_area_to_assign) do |area|
-        collection.area = area
+
         # Before we can add a collection, the containing object
         # must be saved
         collection.save!

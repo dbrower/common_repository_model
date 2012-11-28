@@ -8,14 +8,18 @@ describe CommonRepositoryModel::Collection do
     subject.respond_to?(:area_name)
   end
 
+  it 'should have an #name_of_area_to_assign' do
+    subject.respond_to?(:name_of_area_to_assign)
+  end
+
   it 'should require an area' do
+    subject.valid?.must_equal false
+
     with_persisted_area(subject.name_of_area_to_assign) do |area|
-      subject.area = area
       subject.area.must_be_kind_of(CommonRepositoryModel::Area)
       subject.valid?.must_equal true
     end
-    subject.area = nil
-    subject.valid?.must_equal false
+
   end
 
   describe '#find_or_build_data_for_given_slot_names' do
@@ -53,34 +57,21 @@ describe CommonRepositoryModel::Collection do
 
   describe 'integration' do
     let(:child_collection) {
-      FactoryGirl.build(:common_repository_model_collection, area: nil)
+      FactoryGirl.build(:common_repository_model_collection)
     }
     it 'should keep a child collection in the parent collection' do
       with_persisted_area(subject.name_of_area_to_assign) do |area_1|
-        with_persisted_area do |area_2|
-          area_1.wont_equal area_2
-
-          subject.area = area_1
-          subject.save!
-
-          child_collection.area = area_2
-
-          child_collection.parent_collections += [subject]
-
-          child_collection.area.must_equal subject.area
-
-          child_collection.save!
-
-          child_collection.area.must_equal subject.area
-        end
+        subject.save!
+        child_collection.parent_collections += [subject]
+        child_collection.area.must_equal subject.area
+        child_collection.save!
+        child_collection.area.must_equal subject.area
       end
     end
     it 'should handle parent/child collection' do
       # Before we can add a collection, the containing object
       # must be saved
       with_persisted_area(subject.name_of_area_to_assign) do |area|
-        subject.area = area
-        child_collection.area = area
         subject.save!
         subject.child_collections << child_collection
         subject.save!
