@@ -16,7 +16,7 @@ describe CommonRepositoryModel::Collection do
     subject.valid?.must_equal false
     subject.errors[:area].size.wont_equal 0
     with_persisted_area(subject.name_of_area_to_assign) do |area|
-      subject.area.must_be_kind_of(CommonRepositoryModel::Area)
+      subject.area.must_equal area
       subject.valid?.must_equal true
     end
 
@@ -60,18 +60,16 @@ describe CommonRepositoryModel::Collection do
       FactoryGirl.build(:common_repository_model_collection)
     }
     it 'should keep a child collection in the parent collection' do
-      with_persisted_area(subject.name_of_area_to_assign) do |area_1|
+      with_persisted_area(subject.name_of_area_to_assign) do
         subject.save!
         child_collection.parent_collections += [subject]
-        child_collection.area.must_equal subject.area
-        child_collection.save!
         child_collection.area.must_equal subject.area
       end
     end
     it 'should handle parent/child collection' do
       # Before we can add a collection, the containing object
       # must be saved
-      with_persisted_area(subject.name_of_area_to_assign) do |area|
+      with_persisted_area(subject.name_of_area_to_assign) do
         subject.save!
         subject.child_collections << child_collection
         subject.save!

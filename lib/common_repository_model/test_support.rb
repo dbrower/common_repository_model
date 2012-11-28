@@ -21,13 +21,17 @@ module CommonRepositoryModel
       end
     end
 
-    def with_persisted_area(name = nil)
+    def with_persisted_area(name = nil, &block)
       options = {}
       options[:name] = name if name
       area = nil
       area = CommonRepositoryModel::Area.find_by_name(name) if name
       area ||= FactoryGirl.create(:common_repository_model_area, options)
-      yield(area)
+      if block.arity == 1
+        block.call(area)
+      else
+        block.call
+      end
     ensure
       area.delete if area
     end
