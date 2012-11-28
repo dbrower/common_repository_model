@@ -5,5 +5,5 @@ require 'common_repository_model/test_support'
 
 describe <%= class_name %> do
   include CommonRepositoryModel::TestSupport
-  subject { FactoryGirl.build(:<% singular_table_name %>) }
+  subject { FactoryGirl.build(:<%= singular_table_name %>) }
 end
