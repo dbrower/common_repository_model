@@ -1,0 +1,12 @@
+require 'spec_helper'
+
+describe <%= class_name %>Serializer do
+  subject { <%= class_name %>Serializer.new(<%= singular_table_name %>) }
+  let(:<%= singular_table_name %>) { FactoryGirl.build(:<%= singular_table_name %>) }
+  let(:json) { JSON.parse(subject.to_json) }
+  let(:root) { json.fetch('<%= singular_table_name %>') }
+  it 'should be JSON' do
+    root.fetch('pid')
+    root.fetch('area').should == <%= singular_table_name %>.area.pid
+  end
+end

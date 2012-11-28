@@ -23,4 +23,18 @@ class CommonRepositoryModel::CollectionGenerator < Rails::Generators::NamedBase
     template 'collection_factory.rb.erb', File.join(options[:test_dir], "#{file_name}_factory.rb")
   end
 
+  def create_serializer
+    template(
+      'collection_serializer.rb.erb',
+      File.join('app/repository_serializers/', "#{file_name}_serializer.rb")
+    )
+  end
+
+  def create_serializer_spec
+    template(
+      'collection_serializer_spec.rb.erb',
+      File.join('spec/repository_serializers/', "#{file_name}_serializer_spec.rb")
+    )
+  end
+
 end

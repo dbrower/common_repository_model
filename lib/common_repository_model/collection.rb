@@ -105,6 +105,10 @@ module CommonRepositoryModel
       end
     end
 
+    def area_name
+      area.name
+    end
+
     include Morphine
     register :named_area_finder do
       CommonRepositoryModel::Area.method(:find_by_name!)

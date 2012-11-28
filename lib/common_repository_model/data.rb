@@ -1,6 +1,7 @@
 require_relative './persistence_base'
 require_relative './collection'
 require_relative './file_datastream'
+require_relative './data_serializer'
 
 class CommonRepositoryModel::Data < CommonRepositoryModel::PersistenceBase
   belongs_to(
@@ -18,8 +19,7 @@ class CommonRepositoryModel::Data < CommonRepositoryModel::PersistenceBase
     m.field :slot_name, :string
     m.field :md5_checksum, :string
   end
-  register_attribute :slot_name, unique: true, to: :properties
-  register_attribute :md5_checksum, unique: true, to: :properties
+  delegate_to :properties, [:slot_name, :md5_checksum], unique: true
   validates :slot_name, presence: true
 
   def content=(file)

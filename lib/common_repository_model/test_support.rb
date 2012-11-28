@@ -11,7 +11,9 @@ module CommonRepositoryModel
   end
 end
 require 'factory_girl'
-begin
-  require_relative '../../spec/factories/common_repository_model/area_factory'
-rescue FactoryGirl::DuplicateDefinitionError
+['collection','area','data'].each do |name|
+  begin
+    require_relative "../../spec/factories/common_repository_model/#{name}_factory"
+  rescue FactoryGirl::DuplicateDefinitionError
+  end
 end

@@ -1,5 +1,6 @@
 require_relative './persistence_base'
 require_relative './collection'
+require_relative './area_serializer'
 module CommonRepositoryModel
   class Area < PersistenceBase
 
@@ -15,7 +16,7 @@ module CommonRepositoryModel
 
     validates :name, presence: true
 
-    register_attribute :name, to: 'properties', unique: true
+    delegate :name, to: 'properties', unique: true
 
     def self.find_by_name(name)
       find({'name_s' => name}).first

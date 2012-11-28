@@ -7,11 +7,6 @@ describe CommonRepositoryModel::Area do
     subject { FactoryGirl.build(:common_repository_model_area, name: name) }
     let(:name) { 'My Area Name'}
 
-    it 'should serialize' do
-      subject.as_json.fetch(:name).must_equal name
-      subject.as_json.fetch(:pid).must_be_kind_of String
-    end
-
     it 'should find or create by #name' do
       lambda { subject.save }.must_raise(NoMethodError)
       lambda { subject.save! }.must_raise(NoMethodError)
@@ -35,7 +30,7 @@ describe CommonRepositoryModel::Area do
   end
 
   describe 'integration (with persistence)' do
-    let(:collection) { FactoryGirl.build(:collection, area: nil) }
+    let(:collection) { FactoryGirl.build(:common_repository_model_collection, area: nil) }
     it 'should .find_by_name and .find_by_name!' do
       with_persisted_area do |area|
         CommonRepositoryModel::Area.find_by_name(area.name).must_equal area

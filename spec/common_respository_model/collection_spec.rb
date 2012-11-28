@@ -2,7 +2,12 @@ require_relative '../spec_helper'
 require 'common_repository_model/collection'
 
 describe CommonRepositoryModel::Collection do
-  subject { FactoryGirl.build(:collection) }
+  subject { FactoryGirl.build(:common_repository_model_collection) }
+
+  it 'should have an #area_name' do
+    subject.respond_to?(:area_name)
+  end
+
   it 'should have #named_area_finder' do
     lambda {
       subject.named_area_finder.call('NEVER-GONNA_EXIST')
@@ -55,7 +60,9 @@ describe CommonRepositoryModel::Collection do
 
 
   describe 'integration' do
-    let(:child_collection) { FactoryGirl.build(:collection, area: nil) }
+    let(:child_collection) {
+      FactoryGirl.build(:common_repository_model_collection, area: nil)
+    }
     it 'should keep a child collection in the parent collection' do
       with_persisted_area do |area_1|
         with_persisted_area do |area_2|

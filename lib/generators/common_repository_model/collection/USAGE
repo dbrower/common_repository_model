@@ -6,5 +6,7 @@ Example:
 
   This will create:
     app/repository_models/chicken_pie.rb
+    app/repository_serializers/chicken_pie_serializer.rb
     spec/repository_models/chicken_pie_spec.rb
+    spec/repository_serializers/chicken_pie_serializer.rb
     spec/factories/chicken_pie_factory.rb

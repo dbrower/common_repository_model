@@ -2,15 +2,10 @@ require_relative '../spec_helper'
 require 'common_repository_model/data'
 
 describe CommonRepositoryModel::Data do
-  subject { FactoryGirl.build(:data) }
-
-  it 'should have friendly #as_json' do
-    subject.as_json.fetch(:slot_name).must_equal subject.slot_name
-    subject.as_json.fetch(:md5_checksum).must_equal subject.md5_checksum
-  end
+  subject { FactoryGirl.build(:common_repository_model_data) }
 
   describe 'integration' do
-    let(:collection) { FactoryGirl.build(:collection) }
+    let(:collection) { FactoryGirl.build(:common_repository_model_collection) }
     let(:file_1) { File.new(__FILE__) }
     let(:file_2) {
       File.new(File.join(File.dirname(__FILE__), '../spec_helper.rb'))

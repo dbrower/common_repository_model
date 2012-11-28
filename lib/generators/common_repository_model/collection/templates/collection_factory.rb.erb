@@ -1,7 +1,11 @@
+# Generated via
+#  `rails generate common_repository_model::collection <%= class_name %>`
+#
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
+require 'common_repository_model/test_support'
 FactoryGirl.define do
-  factory :<%= singular_table_name %> do
+  factory :<%= singular_table_name %>, class: <%= class_name %> do
 <% for attribute in attributes -%>
     <%= attribute.name %> <%= attribute.default.inspect %>
 <% end -%>
