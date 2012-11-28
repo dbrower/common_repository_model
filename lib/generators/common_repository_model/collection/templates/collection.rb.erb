@@ -2,6 +2,10 @@
 #  `rails generate common_repository_model::collection <%= class_name %>`
 require 'common_repository_model/collection'
 class <%= class_name %> < CommonRepositoryModel::Collection
+  # Write the logic for assigning the area
+  def name_of_area_to_assign
+  end
+  protected :name_of_area_to_assign
 
   # ***************************************************************************
   # ***************************************************************************

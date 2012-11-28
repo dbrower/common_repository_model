@@ -56,7 +56,12 @@ describe CommonRepositoryModel::Collection do
   after(:each) do
     area.delete if area.persisted?
   end
-  let(:area) { FactoryGirl.create(:common_repository_model_area) }
+  let(:area) {
+    FactoryGirl.create(
+      :common_repository_model_area,
+      name: Family.new.name_of_area_to_assign
+    )
+  }
   let(:family) { Family.new(area: area) }
   let(:lawyer) { Job.new(area: area) }
   let(:doctor) { Job.new(area: area) }

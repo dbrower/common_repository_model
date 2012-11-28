@@ -32,7 +32,7 @@ describe CommonRepositoryModel::Area do
   describe 'integration (with persistence)' do
     let(:collection) { FactoryGirl.build(:common_repository_model_collection, area: nil) }
     it 'should .find_by_name and .find_by_name!' do
-      with_persisted_area do |area|
+      with_persisted_area(collection.name_of_area_to_assign) do |area|
         CommonRepositoryModel::Area.find_by_name(area.name).must_equal area
         CommonRepositoryModel::Area.
           find_by_name("#{area.name}-tmp").must_equal nil
@@ -44,7 +44,7 @@ describe CommonRepositoryModel::Area do
       end
     end
     it 'should save' do
-      with_persisted_area do |area|
+      with_persisted_area(collection.name_of_area_to_assign) do |area|
         # Before we can add a collection, the containing object
         # must be saved
         area.collections << collection

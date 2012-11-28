@@ -8,22 +8,14 @@ describe CommonRepositoryModel::Collection do
     subject.respond_to?(:area_name)
   end
 
-  it 'should have #named_area_finder' do
-    lambda {
-      subject.named_area_finder.call('NEVER-GONNA_EXIST')
-    }.must_raise CommonRepositoryModel::ObjectNotFoundError
-  end
-
   it 'should require an area' do
-    with_persisted_area do |area|
-      subject.named_area_finder.call(area.name)
-
+    with_persisted_area(subject.name_of_area_to_assign) do |area|
       subject.area = area
       subject.area.must_be_kind_of(CommonRepositoryModel::Area)
       subject.valid?.must_equal true
-      subject.area = nil
-      subject.valid?.must_equal false
     end
+    subject.area = nil
+    subject.valid?.must_equal false
   end
 
   describe '#find_or_build_data_for_given_slot_names' do
@@ -64,7 +56,7 @@ describe CommonRepositoryModel::Collection do
       FactoryGirl.build(:common_repository_model_collection, area: nil)
     }
     it 'should keep a child collection in the parent collection' do
-      with_persisted_area do |area_1|
+      with_persisted_area(subject.name_of_area_to_assign) do |area_1|
         with_persisted_area do |area_2|
           area_1.wont_equal area_2
 
@@ -86,7 +78,7 @@ describe CommonRepositoryModel::Collection do
     it 'should handle parent/child collection' do
       # Before we can add a collection, the containing object
       # must be saved
-      with_persisted_area do |area|
+      with_persisted_area(subject.name_of_area_to_assign) do |area|
         subject.area = area
         child_collection.area = area
         subject.save!

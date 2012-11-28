@@ -60,10 +60,25 @@ module CommonRepositoryModel
       has_and_belongs_to_many(method_name, options)
     end
 
+    before_validation :assign_area!, on: :create
+    def assign_area!
+      self.__area =
+      if area
+        CommonRepositoryModel::Area.find(area.pid)
+      else
+        CommonRepositoryModel::Area.find_by_name!(name_of_area_to_assign)
+      end
+    rescue CommonRepositoryModel::ObjectNotFoundError
+      false
+    end
+    protected :assign_area!
+
+    def name_of_area_to_assign
+      'NDLIB'
+    end
+
     before_save :register_parent_and_collections
     def register_parent_and_collections
-      self.__area = CommonRepositoryModel::Area.find(area.pid) if area
-
       collected_has_members = membership_registry.has_members.
       collect do |association_name|
         public_send(association_name)
@@ -107,11 +122,6 @@ module CommonRepositoryModel
 
     def area_name
       area.name
-    end
-
-    include Morphine
-    register :named_area_finder do
-      CommonRepositoryModel::Area.method(:find_by_name!)
     end
 
     belongs_to(
