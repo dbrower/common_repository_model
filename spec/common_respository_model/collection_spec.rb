@@ -14,7 +14,7 @@ describe CommonRepositoryModel::Collection do
 
   it 'should require an area' do
     subject.valid?.must_equal false
-
+    subject.errors[:area].size.wont_equal 0
     with_persisted_area(subject.name_of_area_to_assign) do |area|
       subject.area.must_be_kind_of(CommonRepositoryModel::Area)
       subject.valid?.must_equal true

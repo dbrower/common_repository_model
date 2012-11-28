@@ -69,7 +69,7 @@ module CommonRepositoryModel
         CommonRepositoryModel::Area.find_by_name!(name_of_area_to_assign)
       end
     rescue CommonRepositoryModel::ObjectNotFoundError
-      false
+      true
     end
     protected :assign_area!
 
