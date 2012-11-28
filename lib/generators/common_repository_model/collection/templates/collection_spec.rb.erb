@@ -1,6 +1,9 @@
 # Generated via
 #  `rails generate common_repository_model::collection <%= class_name %>`
 require 'spec_helper'
+require 'common_repository_model/test_support'
 
 describe <%= class_name %> do
+  include CommonRepositoryModel::TestSupport
+  subject { FactoryGirl.build(:<% singular_table_name %>) }
 end
