@@ -5,7 +5,7 @@
 
 require 'common_repository_model/test_support'
 FactoryGirl.define do
-  factory :<%= singular_table_name %>, class: <%= class_name %> do
+  factory :<%= singular_table_name %>, class: <%= class_name %>, parent: :common_repository_model_collection do
 <% for attribute in attributes -%>
     <%= attribute.name %> <%= attribute.default.inspect %>
 <% end -%>
