@@ -3,6 +3,11 @@ require 'active_model_serializers'
 require_relative './persistence_base_serializer'
 module CommonRepositoryModel
   class ObjectNotFoundError < ActiveFedora::ObjectNotFoundError
+    attr_reader :original_exception
+    def initialize(message, original_exception = nil)
+      super(message)
+      @original_exception = original_exception || self
+    end
   end
 
   class PersistenceBase < ActiveFedora::Base
@@ -11,14 +16,14 @@ module CommonRepositoryModel
       "#{self.class}Serializer".constantize
     end
 
-    class_attribute :attributes_for_json
-    self.attributes_for_json = []
-
-    def self.register_attribute(attribute_name, options = {})
-      delegate(attribute_name, options)
-      self.attributes_for_json ||= []
-      self.attributes_for_json += [attribute_name]
+    def self.find(*args,&block)
+      super
+    rescue RSolr::Error::Http => e
+      raise CommonRepositoryModel::ObjectNotFoundError.new(
+        "#{self}.find(#{args.inspect}) had a SOLR error.", e
+      )
+    rescue ActiveFedora::ObjectNotFoundError => e
+      raise CommonRepositoryModel::ObjectNotFoundError.new(e.message, e)
     end
-
   end
 end
