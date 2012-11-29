@@ -23,6 +23,7 @@
     :has_family_members: hasFamilyMembers
     :is_working_as: isWorkingAs
     :has_workers: hasWorkers
+    :is_volume_of: isVolumeOf
   info:fedora/fedora-system:def/relations-external#:
     :conforms_to: conformsTo
     :has_annotation: hasAnnotation

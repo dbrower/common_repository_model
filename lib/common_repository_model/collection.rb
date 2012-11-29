@@ -77,7 +77,8 @@ module CommonRepositoryModel
       'NDLIB'
     end
 
-    before_save :register_parent_and_collections
+    before_validation :register_parent_and_collections, on: :create
+    before_validation :register_parent_and_collections, on: :update
     def register_parent_and_collections
 
       collected_has_members = membership_registry.has_members.
@@ -90,7 +91,6 @@ module CommonRepositoryModel
       collect do |association_name|
         public_send(association_name)
       end.flatten
-
       self.parent_collections = collected_is_member_of
 
       true

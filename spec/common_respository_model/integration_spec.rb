@@ -1,248 +1,223 @@
 require_relative '../spec_helper'
-require 'common_repository_model/collection'
-
-
-class Clothing < CommonRepositoryModel::Data
-end
-
-class Job < CommonRepositoryModel::Collection
-  has_and_belongs_to_many(
-    :people,
-    class_name: 'Person',
-    property: :has_workers,
-    inverse_of: :is_working_as
-  )
-end
-
-class Family < CommonRepositoryModel::Collection
-  has_members(
-    :family_members,
-    class_name: 'Person',
-    property: :is_family_member_of
-  )
-end
-
-class Person < CommonRepositoryModel::Collection
-
-  is_member_of(
-    :parents,
-    class_name: 'Person',
-    property: :is_child_of
-  )
-
-  has_members(
-    :children,
-    class_name: 'Person',
-    property: :is_child_of
-  )
-
-  # People can be part of multiple families
-  is_member_of(
-    :families,
-    class_name: 'Family',
-    property: :is_family_member_of
-  )
-
-  has_and_belongs_to_many(
-    :jobs,
-    class_name: 'Job',
-    property: :is_working_as,
-    inverse_of: :has_workers
-  )
-
-end
+require_relative '../support/spec_models'
 
 describe CommonRepositoryModel::Collection do
-  let(:family) { Family.new }
-  let(:lawyer) { Job.new }
-  let(:doctor) { Job.new }
-  let(:heathcliff) { Person.new }
-  let(:claire) { Person.new }
-  let(:theo) { Person.new }
-  let(:vanessa) { Person.new }
-  let(:rudy) { Person.new }
-  let(:dress) { Clothing.new(slot_name: 'outerwear') }
+  describe 'with journal / volume' do
+    it 'should have volumes' do
+      journal = Journal.new
+      with_persisted_area(journal.name_of_area_to_assign) do |area|
+        journal.save!
+        volume = JournalVolume.new
+        volume.save!
+        volume.journals << journal
+        volume.save!
 
-  it 'verifies complicated relationships' do
-    with_persisted_area(Family.new.name_of_area_to_assign) do |area|
-      setup_variables
-      verify_initial_relations_for_family
-      verify_initial_relations_for_theo
-      verify_initial_relations_for_claire
-      verify_initial_relations_for_dress
-      verify_claire_adding_a_child
-      verify_claire_losing_a_child
-      verify_rudy_losing_a_parent
+        @journal = journal.class.find(journal.pid)
+        @volume = volume.class.find(volume.pid)
+
+        assert_rels_ext(@volume, :is_volume_of, [@journal])
+        assert_rels_ext(@volume, :is_member_of, [@journal])
+        assert_active_fedora_has_many(@volume, :journals, [@journal])
+
+        assert_rels_ext(@journal, :is_volume_of, [])
+        assert_rels_ext(@journal, :is_member_of, [])
+        assert_active_fedora_has_many(@journal, :volumes, [@volume])
+
+      end
     end
   end
+  describe 'with family' do
+    let(:family) { Family.new }
+    let(:lawyer) { Job.new }
+    let(:doctor) { Job.new }
+    let(:heathcliff) { Person.new }
+    let(:claire) { Person.new }
+    let(:theo) { Person.new }
+    let(:vanessa) { Person.new }
+    let(:rudy) { Person.new }
+    let(:dress) { Clothing.new(slot_name: 'outerwear') }
 
-  protected
-  def setup_variables
-    family.save!
+    it 'verifies complicated relationships' do
+      with_persisted_area(Family.new.name_of_area_to_assign) do |area|
+        setup_variables
+        verify_initial_relations_for_family
+        verify_initial_relations_for_theo
+        verify_initial_relations_for_claire
+        verify_initial_relations_for_dress
+        verify_claire_adding_a_child
+        verify_claire_losing_a_child
+        verify_rudy_losing_a_parent
+      end
+    end
 
-    lawyer.save!
-    doctor.save!
+    protected
+    def setup_variables
+      family.save!
 
-    heathcliff.save!
-    claire.save!
-    theo.save!
-    vanessa.save!
-    rudy.save!
+      lawyer.save!
+      doctor.save!
 
-    dress.save!
+      heathcliff.save!
+      claire.save!
+      theo.save!
+      vanessa.save!
+      rudy.save!
 
-    claire.children = [theo,vanessa,rudy]
-    claire.jobs << lawyer
-    claire.families << family
-    claire.data << dress
-    claire.save!
+      dress.save!
 
-    heathcliff.children = [theo,vanessa,rudy]
-    heathcliff.jobs << doctor
-    heathcliff.families << family
-    heathcliff.save!
+      claire.children = [theo,vanessa,rudy]
+      claire.jobs << lawyer
+      claire.families << family
+      claire.data << dress
+      claire.save!
 
-    theo.families << family
-    theo.save!
-    vanessa.families << family
-    vanessa.save!
-    rudy.families << family
-    rudy.save!
+      heathcliff.children = [theo,vanessa,rudy]
+      heathcliff.jobs << doctor
+      heathcliff.families << family
+      heathcliff.save!
 
-    family.family_members = [claire,heathcliff,theo,vanessa,rudy]
-    family.save!
+      theo.families << family
+      theo.save!
+      vanessa.families << family
+      vanessa.save!
+      rudy.families << family
+      rudy.save!
 
-    @dress = dress.class.find(dress.pid)
-    @theo = theo.class.find(theo.pid)
-    @family = family.class.find(family.pid)
-    @claire = claire.class.find(claire.pid)
-    @rudy = rudy.class.find(rudy.pid)
-    @vanessa = vanessa.class.find(vanessa.pid)
-  end
-  def verify_initial_relations_for_family
-    # We are not storing the RELS-EXT entry on the "container" collection
-    assert_rels_ext(@family,:has_family_members,[])
-    assert_rels_ext(@family,:has_members,[])
+      family.family_members = [claire,heathcliff,theo,vanessa,rudy]
+      family.save!
 
-    # However, we do have access to Family#family_members
-    assert_active_fedora_has_many(
-      @family,
-      :family_members,
-      [@theo,@claire, heathcliff,rudy, @vanessa]
-    )
+      @dress = dress.class.find(dress.pid)
+      @theo = theo.class.find(theo.pid)
+      @family = family.class.find(family.pid)
+      @claire = claire.class.find(claire.pid)
+      @rudy = rudy.class.find(rudy.pid)
+      @vanessa = vanessa.class.find(vanessa.pid)
+    end
+    def verify_initial_relations_for_family
+      # We are not storing the RELS-EXT entry on the "container" collection
+      assert_rels_ext(@family,:has_family_members,[])
+      assert_rels_ext(@family,:has_members,[])
 
-    assert_active_fedora_has_many(
-      @family,
-      :child_collections,
-      [@theo,@claire, heathcliff,rudy, @vanessa]
-    )
-  end
+      # However, we do have access to Family#family_members
+      assert_active_fedora_has_many(
+        @family,
+        :family_members,
+        [@theo,@claire, heathcliff,rudy, @vanessa]
+      )
 
-  def verify_initial_relations_for_theo
-    assert_rels_ext @theo, :is_child_of, [@claire, heathcliff]
-    assert_rels_ext @theo, :is_member_of, [@claire, family, heathcliff]
+      assert_active_fedora_has_many(
+        @family,
+        :child_collections,
+        [@theo,@claire, heathcliff,rudy, @vanessa]
+      )
+    end
 
-    assert_active_fedora_has_many(@theo, :jobs, [])
-    assert_active_fedora_has_many(@theo, :families, [family])
-    assert_active_fedora_has_many(@theo, :parents, [heathcliff,claire])
-    assert_active_fedora_has_many(@theo, :child_collections, [])
-    assert_active_fedora_has_many(
-      @theo, :parent_collections, [heathcliff,claire,family]
-    )
-  end
+    def verify_initial_relations_for_theo
+      assert_rels_ext @theo, :is_child_of, [@claire, heathcliff]
+      assert_rels_ext @theo, :is_member_of, [@claire, family, heathcliff]
 
-  def verify_initial_relations_for_dress
-    assert_rels_ext(@dress, :is_part_of, [@claire])
-    assert_active_fedora_belongs_to(@dress, :collection, @claire)
-  end
+      assert_active_fedora_has_many(@theo, :jobs, [])
+      assert_active_fedora_has_many(@theo, :families, [family])
+      assert_active_fedora_has_many(@theo, :parents, [heathcliff,claire])
+      assert_active_fedora_has_many(@theo, :child_collections, [])
+      assert_active_fedora_has_many(
+        @theo, :parent_collections, [heathcliff,claire,family]
+      )
+    end
 
-  def verify_initial_relations_for_claire
-    assert_rels_ext @claire, :is_parent_of, []
-    assert_rels_ext @claire, :is_child_of, []
-    assert_rels_ext @claire, :is_family_member_of, [family]
-    assert_rels_ext @claire, :is_member_of, [family]
+    def verify_initial_relations_for_dress
+      assert_rels_ext(@dress, :is_part_of, [@claire])
+      assert_active_fedora_belongs_to(@dress, :collection, @claire)
+    end
 
-    assert_active_fedora_has_many(@claire,:data,[@dress])
-    assert_active_fedora_has_many(@claire,:jobs,[lawyer])
-    assert_active_fedora_has_many(@claire,:families,[family])
-    assert_active_fedora_has_many(@claire,:children,[theo, rudy, @vanessa])
-    assert_active_fedora_has_many(
-      @claire,:child_collections,[theo, rudy, @vanessa]
-    )
-    assert_active_fedora_has_many(@claire,:parent_collections,[family])
-  end
+    def verify_initial_relations_for_claire
+      assert_rels_ext @claire, :is_parent_of, []
+      assert_rels_ext @claire, :is_child_of, []
+      assert_rels_ext @claire, :is_family_member_of, [family]
+      assert_rels_ext @claire, :is_member_of, [family]
 
-  def verify_claire_adding_a_child
-    @sandra = Person.new
-    @sandra.save!
-    @claire.children << @sandra
-    @claire.save!
-    @claire = @claire.class.find(@claire.pid)
-    @sandra = @sandra.class.find(@sandra.pid)
+      assert_active_fedora_has_many(@claire,:data,[@dress])
+      assert_active_fedora_has_many(@claire,:jobs,[lawyer])
+      assert_active_fedora_has_many(@claire,:families,[family])
+      assert_active_fedora_has_many(@claire,:children,[theo, rudy, @vanessa])
+      assert_active_fedora_has_many(
+        @claire,:child_collections,[theo, rudy, @vanessa]
+      )
+      assert_active_fedora_has_many(@claire,:parent_collections,[family])
+    end
 
-    assert_rels_ext @claire, :is_parent_of, []
-    assert_rels_ext @claire, :is_child_of, []
+    def verify_claire_adding_a_child
+      @sandra = Person.new
+      @sandra.save!
+      @claire.children << @sandra
+      @claire.save!
+      @claire = @claire.class.find(@claire.pid)
+      @sandra = @sandra.class.find(@sandra.pid)
 
-    assert_active_fedora_has_many(@claire,:parents,[])
-    assert_active_fedora_has_many(@claire,:children,[theo, rudy, @vanessa,@sandra])
-    assert_active_fedora_has_many(
-      @claire,:child_collections,[theo, rudy, @vanessa, @sandra]
-    )
-    assert_active_fedora_has_many(
-      @claire,:parent_collections,[family]
-    )
-  end
+      assert_rels_ext @claire, :is_parent_of, []
+      assert_rels_ext @claire, :is_child_of, []
 
-  def verify_claire_losing_a_child
-    @vanessa.break_relation_with_parents(@claire)
-    @vanessa.save!
-    @sandra.break_relation_with_parents(@claire)
-    @sandra.save!
+      assert_active_fedora_has_many(@claire,:parents,[])
+      assert_active_fedora_has_many(@claire,:children,[theo, rudy, @vanessa,@sandra])
+      assert_active_fedora_has_many(
+        @claire,:child_collections,[theo, rudy, @vanessa, @sandra]
+      )
+      assert_active_fedora_has_many(
+        @claire,:parent_collections,[family]
+      )
+    end
 
-    @claire.save!
-    @claire = @claire.class.find(@claire.pid)
+    def verify_claire_losing_a_child
+      @vanessa.break_relation_with_parents(@claire)
+      @vanessa.save!
+      @sandra.break_relation_with_parents(@claire)
+      @sandra.save!
 
-    assert_active_fedora_has_many(@claire,:children,[theo, rudy])
-    assert_active_fedora_has_many(
-      @claire,:child_collections,[theo, rudy]
-    )
+      @claire.save!
+      @claire = @claire.class.find(@claire.pid)
 
-    @vanessa = @vanessa.class.find(@vanessa.pid)
+      assert_active_fedora_has_many(@claire,:children,[theo, rudy])
+      assert_active_fedora_has_many(
+        @claire,:child_collections,[theo, rudy]
+      )
 
-    # Note, just because we said Claire was not Vanessa's parent, Vanessa did
-    # not update
-    assert_rels_ext(@vanessa, :is_child_of, [heathcliff])
-    assert_rels_ext(@vanessa, :is_member_of, [heathcliff, family])
+      @vanessa = @vanessa.class.find(@vanessa.pid)
 
-    assert_active_fedora_has_many(@vanessa, :parents, [heathcliff])
-    assert_active_fedora_has_many(
-      @vanessa, :parent_collections, [heathcliff, family]
-    )
+      # Note, just because we said Claire was not Vanessa's parent, Vanessa did
+      # not update
+      assert_rels_ext(@vanessa, :is_child_of, [heathcliff])
+      assert_rels_ext(@vanessa, :is_member_of, [heathcliff, family])
 
-  end
+      assert_active_fedora_has_many(@vanessa, :parents, [heathcliff])
+      assert_active_fedora_has_many(
+        @vanessa, :parent_collections, [heathcliff, family]
+      )
 
-  def verify_rudy_losing_a_parent
-    assert_rels_ext @rudy, :is_child_of, [heathcliff,@claire]
-    assert_rels_ext @rudy, :is_member_of, [heathcliff,@claire,family]
-    assert_active_fedora_has_many @rudy, :parents, [heathcliff,@claire]
-    assert_active_fedora_has_many(
-      @rudy, :parent_collections, [heathcliff,@claire,family]
-    )
+    end
 
-    @rudy.break_relation_with_parents(heathcliff)
-    @rudy.save!
+    def verify_rudy_losing_a_parent
+      assert_rels_ext @rudy, :is_child_of, [heathcliff,@claire]
+      assert_rels_ext @rudy, :is_member_of, [heathcliff,@claire,family]
+      assert_active_fedora_has_many @rudy, :parents, [heathcliff,@claire]
+      assert_active_fedora_has_many(
+        @rudy, :parent_collections, [heathcliff,@claire,family]
+      )
 
-    assert_active_fedora_has_many(@rudy, :parents, [@claire])
-    assert_active_fedora_has_many(@rudy, :parent_collections, [@claire, family])
-    assert_rels_ext @rudy, :is_child_of, [@claire]
-    assert_rels_ext @rudy, :is_member_of, [@claire, family]
+      @rudy.break_relation_with_parents(heathcliff)
+      @rudy.save!
 
-    @rudy = @rudy.class.find(@rudy.pid)
+      assert_active_fedora_has_many(@rudy, :parents, [@claire])
+      assert_active_fedora_has_many(@rudy, :parent_collections, [@claire, family])
+      assert_rels_ext @rudy, :is_child_of, [@claire]
+      assert_rels_ext @rudy, :is_member_of, [@claire, family]
 
-    assert_rels_ext @rudy, :is_child_of, [@claire]
-    assert_rels_ext @rudy, :is_member_of, [@claire, family]
+      @rudy = @rudy.class.find(@rudy.pid)
 
-    assert_active_fedora_has_many(@rudy, :parents, [@claire])
-    assert_active_fedora_has_many(@rudy, :parent_collections, [@claire, family])
+      assert_rels_ext @rudy, :is_child_of, [@claire]
+      assert_rels_ext @rudy, :is_member_of, [@claire, family]
+
+      assert_active_fedora_has_many(@rudy, :parents, [@claire])
+      assert_active_fedora_has_many(@rudy, :parent_collections, [@claire, family])
+    end
   end
 end
