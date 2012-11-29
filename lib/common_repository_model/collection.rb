@@ -79,6 +79,7 @@ module CommonRepositoryModel
 
     before_save :register_parent_and_collections
     def register_parent_and_collections
+
       collected_has_members = membership_registry.has_members.
       collect do |association_name|
         public_send(association_name)
