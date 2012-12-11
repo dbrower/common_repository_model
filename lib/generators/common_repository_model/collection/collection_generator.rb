@@ -1,8 +1,8 @@
 require 'rails/generators'
 
 class CommonRepositoryModel::CollectionGenerator < Rails::Generators::NamedBase
+  check_class_collision
   source_root File.expand_path('../templates', __FILE__)
-  argument :attributes, :type => :array, :default => [], :banner => "field:type field:type"
   class_option :test_dir, :type => :string, :default => "spec/factories", :desc => "The directory where the factories should go"
 
   def create_collection
