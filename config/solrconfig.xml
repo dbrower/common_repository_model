@@ -39,7 +39,7 @@
 
          -Dsolr.abortOnConfigurationError=false
     -->
-  <abortOnConfigurationError>${solr.abortOnConfigurationError:false}</abortOnConfigurationError>
+  <abortOnConfigurationError>${solr.abortOnConfigurationError:true}</abortOnConfigurationError>
   
   <!-- Controls what version of Lucene various components of Solr
        adhere to.  Generally, you want to use the latest version to
@@ -47,7 +47,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
     -->
-  <luceneMatchVersion>LUCENE_36</luceneMatchVersion>
+  <luceneMatchVersion>LUCENE_35</luceneMatchVersion>
 
   <!-- lib directives can be used to instruct Solr to load an Jars
        identified and use them to resolve any "plugins" specified in
@@ -64,21 +64,43 @@
               <lib dir="./lib" />
     -->
 
+  <!-- Blacklight jetty solr lib dirs -->
+  <lib dir="./contrib/extraction/lib" />
+  <lib dir="./contrib/clustering/lib/" />
+  <lib dir="./contrib/velocity/lib" />
+  <lib dir="./contrib/analysis-extras/lib" />
+  <lib dir="./contrib/analysis-extras/lucene-libs" />
+
   <!-- A dir option by itself adds any files found in the directory to
        the classpath, this is useful for including all jars in a
        directory.
     -->
+  <lib dir="../../contrib/extraction/lib" />
+  <lib dir="../../contrib/clustering/lib/" />
+  <lib dir="../../contrib/velocity/lib" />
 
   <!-- When a regex is specified in addition to a directory, only the
        files in that directory which completely match the regex
        (anchored on both ends) will be included.
     -->
+  <lib dir="../../dist/" regex="apache-solr-cell-\d.*\.jar" />
+  <lib dir="../../dist/" regex="apache-solr-clustering-\d.*\.jar" />
+  <lib dir="../../dist/" regex="apache-solr-dataimporthandler-\d.*\.jar" />
+  <lib dir="../../dist/" regex="apache-solr-langid-\d.*\.jar" />
+  <lib dir="../../dist/" regex="apache-solr-velocity-\d.*\.jar" />
+
   <!-- If a dir option (with or without a regex) is used and nothing
        is found that matches, it will be ignored
     -->
+  <lib dir="../../contrib/clustering/lib/" />
+  <lib dir="/total/crap/dir/ignored" />
+
   <!-- an exact path can be used to specify a specific file.  This
        will cause a serious error to be logged if it can't be loaded.
     -->
+  <!--
+  <lib path="../a-jar-that-does-not-exist.jar" /> 
+  -->
   
   <!-- Data Directory
 
@@ -535,16 +557,15 @@
       -->
     <listener event="newSearcher" class="solr.QuerySenderListener">
       <arr name="queries">
-        <!--
-           <lst><str name="q">solr</str><str name="sort">price asc</str></lst>
-           <lst><str name="q">rocks</str><str name="sort">weight asc</str></lst>
-          -->
+        <lst>
+          <str name="q">hydrus</str>
+        </lst>
       </arr>
     </listener>
     <listener event="firstSearcher" class="solr.QuerySenderListener">
       <arr name="queries">
         <lst>
-          <str name="q">static firstSearcher warming in solrconfig.xml</str>
+          <str name="q">hydrus</str>
         </lst>
       </arr>
     </listener>
@@ -683,27 +704,6 @@
        not be initialized until the first request that uses it.
 
     -->
-    
-    <!-- SearchHandler
-
-       http://wiki.apache.org/solr/SearchHandler
-
-       For processing Search Queries, the primary Request Handler
-       provided with Solr is "SearchHandler" It delegates to a sequent
-       of SearchComponents (see below) and supports distributed
-       queries across multiple shards
-    -->
-  <requestHandler name="standard" class="solr.SearchHandler" default="true">
-    <!-- default values for query parameters -->
-     <lst name="defaults">
-       <str name="echoParams">explicit</str>
-       <!--
-       <int name="rows">10</int>
-       <str name="fl">*</str>
-       <str name="version">2.1</str>
-        -->
-     </lst>
-  </requestHandler>
   <!-- SearchHandler
 
        http://wiki.apache.org/solr/SearchHandler
@@ -713,6 +713,7 @@
        of SearchComponents (see below) and supports distributed
        queries across multiple shards
     -->
+
   <requestHandler name="search" class="solr.SearchHandler" default="true">
     <!-- default values for query parameters can be specified, these
          will be overridden by parameters in the request
@@ -720,11 +721,8 @@
      <lst name="defaults">
        <str name="defType">dismax</str>
        <str name="echoParams">explicit</str>
-       <int name="rows">10</int>
-
        <str name="q.alt">*:*</str>
        <str name="mm">2&lt;-1 5&lt;-2 6&lt;90%</str>
-
        <!-- this qf and pf are used by default, if not otherwise specified by
             client. The default blacklight_config will use these for the
             "keywords" search. See the author_qf/author_pf, title_qf, etc 
@@ -732,56 +730,21 @@
             those searches. You may also be interested in:
             http://wiki.apache.org/solr/LocalParams
        -->
+        <str name="qf">
+          id
+          title_t^25000
+          text
+          active_fedora_model_s
+          object_type_facet
+        </str>
+        <str name="pf">
+          id
+          title_t^250000
+          text^10
+          active_fedora_model_s
+          object_type_facet
+        </str>
 
-       <str name="qf">
-         title_unstem_search^100000
-         subtitle_unstem_search^50000
-         title_t^25000
-         subtitle_t^10000
-         title_addl_unstem_search^5000
-         title_addl_t^2500
-         title_added_entry_unstem_search^1500
-         title_added_entry_t^1250
-         subject_topic_unstem_search^1000
-         subject_unstem_search^750
-         subject_topic_facet^625
-         subject_t^500
-         author_unstem_search^250
-         author_addl_unstem_search^250
-         author_t^100
-         author_addl_t^50
-         subject_addl_unstem_search^250
-         subject_addl_t^50
-         title_series_unstem_search^25
-         title_series_t^10
-         isbn_t
-         issn_t
-         category_facet
-         text
-       </str>
-       <str name="pf">
-         title_unstem_search^1000000
-         subtitle_unstem_search^500000
-         title_t^250000
-         subtitle_t^100000
-         title_addl_unstem_search^50000
-         title_addl_t^25000
-         title_added_entry_unstem_search^15000
-         title_added_entry_t^12500
-         subject_topic_unstem_search^10000
-         subject_unstem_search^7500
-         subject_topic_facet^6250
-         subject_t^5000
-         author_unstem_search^2500
-         author_addl_unstem_search^2500
-         author_t^1000
-         author_addl_t^500
-         subject_addl_unstem_search^2500
-         subject_addl_t^500
-         title_series_unstem_search^250
-         title_series_t^100
-         text^10
-       </str>
        <str name="author_qf">
          author_unstem_search^200
          author_addl_unstem_search^50
@@ -840,35 +803,13 @@
 
        <!-- NOT using marc_display because it is large and will slow things down for search results -->
        <str name="fl">
-         id, 
+         *, 
          score,
-         author_display,
-         author_vern_display, 
-         format, 
-         isbn_t, 
-         issn_t,
-         category_facet,
-         language_facet, 
-         lc_callnum_display,
-         material_type_display, 
-         published_display,
-         published_vern_display,
-         pub_date,
-         title_display,
-         title_vern_display,
-         subject_topic_facet,
-         subject_geo_facet,
-         subject_era_facet,
-         subtitle_display,
-         subtitle_vern_display,
-         url_fulltext_display,
-         url_suppl_display,
        </str>
 
        <str name="facet">true</str>
        <str name="facet.mincount">1</str>
-       <str name="facet.limit">-1</str>
-       <str name="facet.sort">index</str>
+       <str name="facet.limit">10</str>
        <str name="facet.field">format</str>
        <str name="facet.field">lc_1letter_facet</str>
        <str name="facet.field">lc_alpha_facet</str>
@@ -878,8 +819,6 @@
        <str name="facet.field">subject_era_facet</str>
        <str name="facet.field">subject_geo_facet</str>
        <str name="facet.field">subject_topic_facet</str>
-       
-       <str name="f.provider_facet.facet.sort">count</str>
        
        <str name="spellcheck">true</str>
        <str name="spellcheck.dictionary">default</str>
@@ -946,6 +885,95 @@
     </arr>
       
   </requestHandler>
+
+
+<!-- Hydra Additions Start -->
+
+  <requestHandler name="standard" class="solr.SearchHandler">
+     <lst name="defaults">
+       <str name="echoParams">explicit</str>
+     </lst>
+  </requestHandler>
+
+  <requestHandler name="fulltext" class="solr.SearchHandler" >
+    <lst name="defaults">
+      <str name="defType">dismax</str>
+      <str name="facet">on</str>
+      <str name="facet.mincount">1</str>
+      <str name="echoParams">explicit</str>
+      <float name="tie">0.01</float>
+      <str name="qf">id^0.8 id_t^0.8 format text^0.3</str>
+      <str name="pf">id^0.9  id_t^0.9 text^0.5</str>
+      <str name="fl">
+        id,text,title_t,date_t,year_facet,month_facet,medium_t,series_facet,box_facet,folder_facet
+      </str>
+      <str name="mm"> 2&lt;-1 5&lt;-2 6&lt;90% </str>
+      <int name="ps">100</int>
+      <str name="q.alt">*:*</str>
+    </lst>
+  </requestHandler>
+
+  <requestHandler name="permissions" class="solr.SearchHandler" >
+    <lst name="defaults">
+      <str name="facet">off</str>
+      <str name="echoParams">all</str>
+      <str name="rows">1</str>
+      <str name="q">{!raw f=id v=$id}</str> <!-- use id=666 instead of q=id:666 -->
+      <str name="fl">
+        id,access_t,
+        discover_access_group_t,discover_access_person_t,
+        read_access_group_t,read_access_person_t,
+        edit_access_group_t,edit_access_person_t,
+        depositor_t,
+        embargo_release_date_dt
+      </str>
+    </lst>
+  </requestHandler>
+
+  <requestHandler name="public_search" class="solr.SearchHandler" >
+    <lst name="defaults">
+      <!-- Making defType lucene to exclude file assets -->
+      <str name="defType">lucene</str>
+      <!-- lucene params -->
+      <str name="df">has_model_s</str>
+      <str name="q.op">AND</str>
+      <!-- dismax params -->
+      <str name="mm"> 2&lt;-1 5&lt;-2 6&lt;90% </str>
+      <str name="q.alt">*:*</str>
+      <str name="qf">id^0.8 id_t^0.8 format text^0.3 journal_issn_t</str>
+      <str name="pf">id^0.9  id_t^0.9 text^0.5 journal_issn_t</str>
+      <str name="qf_dismax">id^0.8 id_t^0.8 format text^0.3</str>
+      <str name="pf_dismax">id^0.9  id_t^0.9 text^0.5</str>
+      <int name="ps">100</int>
+      <float name="tie">0.01</float>
+      <!-- general -->
+      <str name="facet">on</str>
+      <str name="facet.mincount">1</str>
+            <str name="echoParams">explicit</str>
+      <str name="fl">
+       *,score
+      </str>
+    </lst>
+  </requestHandler>
+
+  <requestHandler name="fulltext" class="solr.SearchHandler" >
+    <lst name="defaults">
+      <str name="defType">dismax</str>
+      <str name="facet">on</str>
+      <str name="facet.mincount">1</str>
+      <str name="echoParams">explicit</str>
+      <float name="tie">0.01</float>
+      <str name="qf">id^0.8 id_t^0.8 format text^0.3</str>
+      <str name="pf">id^0.9  id_t^0.9 text^0.5</str>
+      <str name="fl">
+        id,text,title_t,date_t,year_facet,month_facet,medium_t,series_facet,box_facet,folder_facet
+      </str>
+      <str name="mm"> 2&lt;-1 5&lt;-2 6&lt;90% </str>
+      <int name="ps">100</int>
+      <str name="q.alt">*:*</str>
+    </lst>
+  </requestHandler>
+<!-- Hydra Additions End -->
 
   <!-- for requests to get a single document; use id=666 instead of q=id:666 -->
   <requestHandler name="document" class="solr.SearchHandler" >
@@ -1045,8 +1073,6 @@
         author_vern_display, 
         format, 
         isbn_t, 
-        issn_t,
-        category_facet,
         language_facet, 
         lc_callnum_display,
         material_type_display, 
@@ -1799,15 +1825,13 @@
      -->
     <str name="content-type">text/plain; charset=UTF-8</str>
   </queryResponseWriter>
-  
+
   <!--
      Custom response writers can be declared as needed...
     -->
     <!-- The solr.velocity.enabled flag is used by Solr's test cases so that this response writer is not
          loaded (causing an error if contrib/velocity has not been built fully) -->
-    <!-- <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" enable="${solr.velocity.enabled:true}"/> -->
-    <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" enable="${solr.velocity.enabled:false}"/>
-  
+    <queryResponseWriter name="velocity" class="solr.VelocityResponseWriter" enable="${solr.velocity.enabled:true}"/>
 
   <!-- XSLT response writer transforms the XML output by any xslt file found
        in Solr's conf/xslt directory.  Changes to xslt files are checked for
