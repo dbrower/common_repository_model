@@ -1,15 +1,8 @@
 require 'active_fedora'
 require 'active_model_serializers'
 require_relative './persistence_base_serializer'
+require_relative './exceptions'
 module CommonRepositoryModel
-  class ObjectNotFoundError < ActiveFedora::ObjectNotFoundError
-    attr_reader :original_exception
-    def initialize(message, original_exception = nil)
-      super(message)
-      @original_exception = original_exception || self
-    end
-  end
-
   class PersistenceBase < ActiveFedora::Base
     include ActiveModel::SerializerSupport
     def active_model_serializer
