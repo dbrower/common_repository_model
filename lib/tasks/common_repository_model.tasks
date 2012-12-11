@@ -1,4 +1,19 @@
 namespace :common_repository_model do
+  task :configure_hydra_jetty do
+    require 'fileutils'
+    path_to_hydra_jetty_project = "../hydra-jetty"
+
+    ['solr/test-core','solr/development-core'].each do |subdir|
+      FileUtils.cp(
+        'config/schema.xml',
+        File.join(path_to_hydra_jetty_project, subdir, 'conf/schema.xml')
+      )
+      FileUtils.cp(
+        'config/solrconfig.xml',
+        File.join(path_to_hydra_jetty_project, subdir, 'conf/solrconfig.xml')
+      )
+    end
+  end
   task :prompt_for_area => :environment do
     require 'highline'
     highline = HighLine.new
