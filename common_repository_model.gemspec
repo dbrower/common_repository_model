@@ -27,6 +27,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "active_model_serializers"
   gem.add_dependency "active-fedora", "5.2.0"
   gem.add_development_dependency "minitest"
+  gem.add_development_dependency "equivalent-xml"
   gem.add_development_dependency "minitest-matchers"
   gem.add_development_dependency "factory_girl"
 end

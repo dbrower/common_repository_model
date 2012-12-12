@@ -1,6 +1,7 @@
 require_relative '../spec_helper'
 require 'common_repository_model/area'
 require 'common_repository_model/collection'
+require 'equivalent-xml'
 
 describe CommonRepositoryModel::Area do
   describe 'without persisting' do
@@ -29,6 +30,38 @@ describe CommonRepositoryModel::Area do
     end
   end
 
+  describe 'fedora entries' do
+
+    def rels_ext_expected_area_lines(area)
+      lines_of_text = []
+      lines_of_text << %()
+      lines_of_text << %(<rdf:RDF xmlns:ns0="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">)
+      lines_of_text << %(  <rdf:Description rdf:about="#{area.internal_uri}">)
+      lines_of_text << %(    <ns0:hasModel rdf:resource="info:fedora/afmodel:#{area.class.to_s.gsub('::','_')}"></ns0:hasModel>)
+      lines_of_text << %(  </rdf:Description>)
+      lines_of_text << %(</rdf:RDF>)
+      lines_of_text.join("\n")
+    end
+
+    # Paranoid validation here as our RELS-EXT entry is critical
+    it 'should have expected RELS-EXT entry' do
+      @area = FactoryGirl.create(:common_repository_model_area)
+      base_url = ActiveFedora.config.credentials[:url]
+      object_url = File.join(base_url, 'objects', @area.pid)
+      rels_ext_url = File.join(object_url, 'datastreams/RELS-EXT/content')
+      response = RestClient.get(rels_ext_url)
+      actual_document = Nokogiri::XML(response.body)
+      expected_document = Nokogiri::XML(rels_ext_expected_area_lines(@area))
+
+      EquivalentXml.equivalent?(
+        actual_document, expected_document, normalize_whitespace: true
+      ) { |actual, expected, result|
+        result.must_equal true
+      }.must_equal true
+
+    end
+  end
+
   describe 'integration (with persistence)' do
     let(:collection) { FactoryGirl.build(:common_repository_model_collection) }
     it 'should .find_by_name and .find_by_name!' do
@@ -43,6 +76,7 @@ describe CommonRepositoryModel::Area do
         }.must_raise(CommonRepositoryModel::ObjectNotFoundError)
       end
     end
+
     it 'should save' do
       with_persisted_area(collection.name_of_area_to_assign) do |area|
         # Before we can add a collection, the containing object
