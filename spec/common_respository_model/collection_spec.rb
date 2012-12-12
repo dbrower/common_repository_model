@@ -1,5 +1,6 @@
 require_relative '../spec_helper'
 require 'common_repository_model/collection'
+require 'equivalent-xml'
 
 describe CommonRepositoryModel::Collection do
   subject { FactoryGirl.build(:common_repository_model_collection) }
@@ -54,6 +55,38 @@ describe CommonRepositoryModel::Collection do
     end
   end
 
+  describe 'fedora entries' do
+    let(:collection) {
+      FactoryGirl.build(:common_repository_model_collection)
+    }
+
+    def build_expected_rels_ext_for_collection(collection)
+      lines_of_text = []
+      lines_of_text << %()
+      lines_of_text << %(<rdf:RDF xmlns:ns0="info:common_repository_model#" xmlns:ns1="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">)
+      lines_of_text << %(<rdf:Description rdf:about="#{collection.internal_uri}">)
+      lines_of_text << %(<ns0:isMemberOfArea rdf:resource="#{collection.area.internal_uri}"></ns0:isMemberOfArea>)
+      lines_of_text << %(<ns1:hasModel rdf:resource="info:fedora/afmodel:#{collection.class.to_s.gsub('::','_')}"></ns1:hasModel>)
+      lines_of_text << %(</rdf:Description>)
+      lines_of_text << %(</rdf:RDF>)
+      lines_of_text.join("\n")
+    end
+
+    # Paranoid validation here as our RELS-EXT entry is critical
+    it 'should have expected RELS-EXT entry' do
+      with_persisted_area(collection.name_of_area_to_assign) do
+        collection.save!
+        base_url = ActiveFedora.config.credentials[:url]
+        object_url = File.join(base_url, 'objects', collection.pid)
+        rels_ext_url = File.join(object_url, 'datastreams/RELS-EXT/content')
+        response = RestClient.get(rels_ext_url)
+
+        expected = build_expected_rels_ext_for_collection(collection)
+
+        assert_xml_equivalent(response.body, expected)
+      end
+    end
+  end
 
   describe 'integration' do
     let(:child_collection) {

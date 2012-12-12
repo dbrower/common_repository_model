@@ -1,7 +1,6 @@
 require_relative '../spec_helper'
 require 'common_repository_model/area'
 require 'common_repository_model/collection'
-require 'equivalent-xml'
 
 describe CommonRepositoryModel::Area do
   describe 'without persisting' do
@@ -32,7 +31,7 @@ describe CommonRepositoryModel::Area do
 
   describe 'fedora entries' do
 
-    def rels_ext_expected_area_lines(area)
+    def build_expected_rels_ext_for_area(area)
       lines_of_text = []
       lines_of_text << %()
       lines_of_text << %(<rdf:RDF xmlns:ns0="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">)
@@ -50,15 +49,9 @@ describe CommonRepositoryModel::Area do
       object_url = File.join(base_url, 'objects', @area.pid)
       rels_ext_url = File.join(object_url, 'datastreams/RELS-EXT/content')
       response = RestClient.get(rels_ext_url)
-      actual_document = Nokogiri::XML(response.body)
-      expected_document = Nokogiri::XML(rels_ext_expected_area_lines(@area))
+      expected_body = build_expected_rels_ext_for_area(@area)
 
-      EquivalentXml.equivalent?(
-        actual_document, expected_document, normalize_whitespace: true
-      ) { |actual, expected, result|
-        result.must_equal true
-      }.must_equal true
-
+      assert_xml_equivalent(response.body, expected_body)
     end
   end
 

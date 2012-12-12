@@ -1,5 +1,17 @@
+require 'equivalent-xml'
+
 module CommonRepositoryModel
   module TestSupport
+
+    def assert_xml_equivalent(expected_string, actual_string, options = {})
+      options.reverse_merge!(normalize_whitespace: true)
+      expected = Nokogiri::XML(expected_string)
+      actual = Nokogiri::XML(actual_string)
+      EquivalentXml.equivalent?(expected, actual, options) {|na,ne,is_equal|
+        assert is_equal, "Expected/Actual:\n\t#{na}\n\t#{ne}"
+      }
+    end
+
     def assert_rels_ext(subject, predicate, objects = [])
       assert_equal objects.count, subject.relationships(predicate).count
       objects.each do |object|
