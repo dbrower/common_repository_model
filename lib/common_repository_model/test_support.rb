@@ -2,6 +2,16 @@ require 'equivalent-xml'
 
 module CommonRepositoryModel
   module TestSupport
+    def assert_fedora_datastream(object, expected_body, datastream_name)
+      base_url = ActiveFedora.config.credentials[:url]
+      rels_ext_url = File.join(
+        base_url, 'objects', object.pid,
+        'datastreams', datastream_name, 'content'
+      )
+      response = RestClient.get(rels_ext_url)
+
+      assert_xml_equivalent(response.body, expected_body)
+    end
 
     def assert_xml_equivalent(expected_string, actual_string, options = {})
       options.reverse_merge!(normalize_whitespace: true)

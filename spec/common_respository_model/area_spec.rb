@@ -45,13 +45,8 @@ describe CommonRepositoryModel::Area do
     # Paranoid validation here as our RELS-EXT entry is critical
     it 'should have expected RELS-EXT entry' do
       @area = FactoryGirl.create(:common_repository_model_area)
-      base_url = ActiveFedora.config.credentials[:url]
-      object_url = File.join(base_url, 'objects', @area.pid)
-      rels_ext_url = File.join(object_url, 'datastreams/RELS-EXT/content')
-      response = RestClient.get(rels_ext_url)
       expected_body = build_expected_rels_ext_for_area(@area)
-
-      assert_xml_equivalent(response.body, expected_body)
+      assert_fedora_datastream(@area, expected_body, "RELS-EXT")
     end
   end
 

@@ -76,14 +76,8 @@ describe CommonRepositoryModel::Collection do
     it 'should have expected RELS-EXT entry' do
       with_persisted_area(collection.name_of_area_to_assign) do
         collection.save!
-        base_url = ActiveFedora.config.credentials[:url]
-        object_url = File.join(base_url, 'objects', collection.pid)
-        rels_ext_url = File.join(object_url, 'datastreams/RELS-EXT/content')
-        response = RestClient.get(rels_ext_url)
-
-        expected = build_expected_rels_ext_for_collection(collection)
-
-        assert_xml_equivalent(response.body, expected)
+        expected_body = build_expected_rels_ext_for_collection(collection)
+        assert_fedora_datastream(collection, expected_body, "RELS-EXT")
       end
     end
   end
