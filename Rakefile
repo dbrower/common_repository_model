@@ -24,3 +24,6 @@ task :environment do
     environment: :test
   )
 end
+
+desc "Continuous Integration tests"
+task :ci => :test
