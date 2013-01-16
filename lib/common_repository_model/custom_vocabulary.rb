@@ -1,5 +1,5 @@
 require 'rdf'
-class CommonRepositoryModel::CustomVocabulary < RDF::Vocabulary('http://library.nd.edu/meta_data/terms/')
+class CommonRepositoryModel::CustomVocabulary < RDF::Vocabulary('http://library.nd.edu/custom_vocabulary/terms/')
   property :identifierDOI
   property :identifierURI
   property :identifierOther
