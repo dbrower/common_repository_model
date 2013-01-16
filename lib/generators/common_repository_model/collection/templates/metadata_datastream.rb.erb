@@ -4,13 +4,9 @@
 require 'common_repository_model/metadata_datastream'
 
 class <%= class_name %>MetadataDatastream < CommonRepositoryModel::MetadataDatastream
-  set_terminology(
-    namespaces: {
-      'dc' => "http://purl.org/dc/elements/1.1/",
-      'dcterms' => "http://purl.org/dc/terms/",
-      'xsi' => "http://www.w3.org/2001/XMLSchema-instance"
-    }
-  ) do |t|
-    t.named_node(xmlns: 'dc', accessor: text_accessor)
+  register_vocabularies RDF::DC
+  map_predicates do |map|
+    map.title(:in => RDF::DC)
+    map.created(:in => RDF::DC)
   end
 end

@@ -4,16 +4,4 @@ require 'spec_helper'
 require 'common_repository_model/test_support'
 
 describe <%= class_name %>MetadataDatastream do
-  include CommonRepositoryModel::TestSupport
-  let(:raw_xml) { %(<root><dc:named_node>value</dc:named_node></root>) }
-  subject {
-    <%= class_name %>MetadataDatastream.from_xml(raw_xml)
-  }
-  def self.it_should_have_term_with_value(method_name, value)
-    it "should have ##{method_name}" do
-      subject.send(method_name).should == value
-    end
-  end
-
-  it_should_have_term_with_value :node, ['value']
 end
