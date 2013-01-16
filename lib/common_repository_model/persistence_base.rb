@@ -15,7 +15,7 @@ module CommonRepositoryModel
       raise CommonRepositoryModel::ObjectNotFoundError.new(
         "#{self}.find(#{args.inspect}) had a SOLR error.", e
       )
-    rescue ActiveFedora::ObjectNotFoundError => e
+    rescue ArgumentError, ActiveFedora::ObjectNotFoundError => e
       raise CommonRepositoryModel::ObjectNotFoundError.new(e.message, e)
     end
   end
