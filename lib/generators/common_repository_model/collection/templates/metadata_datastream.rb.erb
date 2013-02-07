@@ -6,7 +6,12 @@ require 'common_repository_model/metadata_datastream'
 class <%= class_name %>MetadataDatastream < CommonRepositoryModel::MetadataDatastream
   register_vocabularies RDF::DC
   map_predicates do |map|
-    map.title(:in => RDF::DC)
+    map.title(:in => RDF::DC) do |index|
+      index.as :searchable, :displayable
+    end
     map.created(:in => RDF::DC)
+    map.creator(:in => RDF::DC) do |index|
+      index.as :searchable, :facetable, :displayable
+    end
   end
 end
