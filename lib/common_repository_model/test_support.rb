@@ -23,6 +23,7 @@ module CommonRepositoryModel
     end
 
     def assert_rels_ext(subject, predicate, objects = [])
+      subject = subject.class.find(subject.pid)
       assert_equal objects.count, subject.relationships(predicate).count
       objects.each do |object|
         internal_uri = object.respond_to?(:internal_uri) ?
@@ -32,10 +33,12 @@ module CommonRepositoryModel
     end
 
     def assert_active_fedora_belongs_to(subject, method_name, object)
+      subject = subject.class.find(subject.pid)
       subject.send(method_name).must_equal object
     end
 
     def assert_active_fedora_has_many(subject, method_name, objects)
+      subject = subject.class.find(subject.pid)
       association = subject.send(method_name)
       assert_equal objects.count, association.count
       objects.each do |object|
